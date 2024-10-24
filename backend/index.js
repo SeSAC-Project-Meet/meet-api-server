@@ -11,7 +11,7 @@ function logger(req, res, next) {
     time: new Date(),
     headers: req.headers,
     body: req.body,
-    ip: req.ip,
+    ip: req.ip, 
   };
   res.send(logText);
   console.log(logText);
