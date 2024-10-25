@@ -1,8 +1,11 @@
 const express = require("express");
-const { PORT } = require("./config");
+const { PORT } = require("./config").development;
+
 const morgan = require("morgan");
 
 const app = express();
+
+const inquiryRouter = require("./inquiry");
 
 function logger(req, res, next) {
   let logText = {
@@ -11,7 +14,7 @@ function logger(req, res, next) {
     time: new Date(),
     headers: req.headers,
     body: req.body,
-    ip: req.ip, 
+    ip: req.ip,
   };
   res.send(logText);
   console.log(logText);
@@ -25,6 +28,8 @@ app.use(logger);
 app.get("/", (req, res) => {
   res.send("Hello, World!");
 });
+
+app.use("/inquiry", inquiryRouter);
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
