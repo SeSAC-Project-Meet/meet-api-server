@@ -2,6 +2,7 @@ const { Sequelize } = require("sequelize");
 
 const config = require("../config.json");
 const dbConfig = config["development"];
+// const dbConfig = require("../config.json")["development local db"]; // 로컬 DB 사용 시
 
 // Sequelize 인스턴스 생성
 const sequelize = new Sequelize(
