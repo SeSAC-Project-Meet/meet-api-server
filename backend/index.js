@@ -4,6 +4,7 @@ const { PORT } = require("./config").development;
 const morgan = require("morgan");
 
 const app = express();
+app.use(express.json());
 
 const inquiryRouter = require("./inquiry");
 
@@ -16,7 +17,7 @@ function logger(req, res, next) {
     body: req.body,
     ip: req.ip,
   };
-  res.send(logText);
+  // res.send(logText);
   console.log(logText);
   next();
 }

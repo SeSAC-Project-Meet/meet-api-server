@@ -1,25 +1,5 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require("./connectToDB"); // connect ETIMEDOUT 에러 발생
-// const { Sequelize } = require("sequelize");
-const dbConfig = require("../config.json")["development"]; // connect ETIMEDOUT 에러 발생
-// const dbConfig = require("../config.json")["development local db"];
-// const sequelize = new Sequelize(
-//   "project_meet",
-//   dbConfig.MYSQL_USER,
-//   dbConfig.MYSQL_PASSWORD,
-//   {
-//     host: dbConfig.MYSQL_HOST,
-//     port: dbConfig.MYSQL_PORT,
-//     dialect: "mysql",
-//     logging: (msg) => console.log(`[Sequelize Log]: ${msg}`),
-//     pool: {
-//       max: 5,
-//       min: 0,
-//       acquire: 30000,
-//       idle: 10000,
-//     },
-//   }
-// );
+const sequelize = require("./connectToDB");
 
 const Inquiry = sequelize.define(
   "Inquiry",
