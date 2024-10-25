@@ -1,7 +1,10 @@
 const express = require("express");
-const { PORT } = require("./config").development;
+
+const { PORT } = require("./config.json").development;
 
 const morgan = require("morgan");
+const passport = require("passport");
+const authRoutes = require("./auth/index.js");
 
 const app = express();
 app.use(express.json());
@@ -17,7 +20,8 @@ function logger(req, res, next) {
     body: req.body,
     ip: req.ip,
   };
-  // res.send(logText);
+
+  // res.send(logText); // 주석처리 해제 안하면 crash .. 확인용 코드라 그럼
   console.log(logText);
   next();
 }
@@ -26,14 +30,17 @@ function logger(req, res, next) {
 app.use(morgan("combined"));
 app.use(logger);
 
-app.get("/", (req, res) => {
-  res.send("Hello, World!");
-});
+// JSON 요청 본문 파싱 미들웨어를 먼저 사용
+app.use(express.json());
+
+// Passport 초기화
+app.use(passport.initialize());
+require("./passport-setup");
+
+app.use("/auth", authRoutes);
 
 app.use("/inquiry", inquiryRouter);
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
-
-// git rebase test

@@ -16,6 +16,8 @@
     "prettier": "3.3.3"
   },
   "dependencies": {
+    "aws-sdk": "^2.1691.0",
+    "axios": "^1.7.7",
     "bcrypt": "^5.1.1",
     "express": "^4.21.0",
     "jsonwebtoken": "^9.0.2",
@@ -23,6 +25,8 @@
     "mysql2": "^3.11.3",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
+    "passport-local": "^1.0.0",
+    "passport-oauth2": "^1.8.0",
     "sequelize": "^6.37.4"
   }
 }
