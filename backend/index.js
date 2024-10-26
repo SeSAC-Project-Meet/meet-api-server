@@ -1,18 +1,31 @@
 const express = require("express");
+const cors = require("cors");
 
 const { PORT } = require("./config.json").development;
 
 const morgan = require("morgan");
 const passport = require("passport");
+
 const authRoutes = require("./auth/index.js");
+const inquiryRouter = require("./inquiry");
+const chatRoutes = require("./chat/index.js");
+
+const { Server } = require("socket.io");
+const http = require("http");
 
 const app = express();
-app.use(express.json());
 
-const inquiryRouter = require("./inquiry");
+const corsOptions = {
+  origin: "http://localhost:5173",
+  credentials: true,
+};
+
+app.use(express.json());
+app.use(cors(corsOptions));
 
 function logger(req, res, next) {
   let logText = {
+    info: "logger LOG",
     url: req.url,
     method: req.method,
     time: new Date(),
@@ -41,6 +54,12 @@ app.use("/auth", authRoutes);
 
 app.use("/inquiry", inquiryRouter);
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+const io = new Server(server, {
+  cors: corsOptions,
+});
+
+chatRoutes(io);

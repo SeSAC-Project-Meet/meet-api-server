@@ -99,8 +99,14 @@ auth.get("/kakao", passport.authenticate("kakao"));
 // 카카오 로그인 콜백 처리
 auth.get(
   "/kakao/callback",
-  passport.authenticate("kakao", { session: false }),
+  passport.authenticate("kakao", {
+    session: false,
+    failureRedirect: "/auth/kakao",
+    successReturnToOrRedirect: "/main",
+  }),
   (req, res) => {
+    console.log("CALLBACK REQUEST");
+    console.log(req.headers, req.cookies);
     // 로그인 성공 후의 처리
     console.log("Kakao login success:", req.user);
     return res

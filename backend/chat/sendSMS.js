@@ -9,19 +9,20 @@ const client = new SNSClient({
   },
 });
 
-const sendSMS = async () => {
+
+const sendSMS = async (text, number) => {
   const params = {
-    Message: "MESSAGE",
-    PhoneNumber: "",
+    Message: text,
+    PhoneNumber: number,
   };
 
   try {
     const command = new PublishCommand(params);
     const data = await client.send(command);
-    console.log("Message sent successfully:", data);
+    console.log("[AWS SNS] Message sent successfully:", data);
   } catch (err) {
-    console.error("Error sending message:", err);
+    console.error("[AWS SNS] Error sending message:", err);
   }
 };
 
-sendSMS();
+module.exports = { sendSMS };

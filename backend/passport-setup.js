@@ -56,9 +56,13 @@ passport.use(
       tokenURL: "https://kauth.kakao.com/oauth/token",
       clientID: config.development.KAKAO_REST_API_KEY, // 카카오 앱 키
       callbackURL: "/auth/kakao/callback", // 설정한 Redirect URI
-      scope: ["profile_nickname", "profile_image", "account_email"],
+      clientSecret: config.development.KAKAO_CLIENT_SECRET, // 카카오 앱 시크릿
+      scope: ["profile_nickname", "profile_image", "account_email", "openid"],
     },
-    async (accessToken, refreshToken, profile, done) => {
+    // verify callback
+    async (accessToken, refreshToken, params, profile, done) => {
+      console.log("🚀 ~ CALLED");
+      console.log(params);
       try {
         const response = await axios.get("https://kapi.kakao.com/v2/user/me", {
           headers: {
@@ -67,7 +71,13 @@ passport.use(
           },
         });
 
+        console.log(profile);
+        // console.log("Access Token:", accessToken);
+        // console.log("Refresh Token:", refreshToken);
+        // console.log("Profile:", profile);
+
         const userProfile = response.data;
+        console.log("🚀 ~ userProfile:", userProfile);
         // 여기서 userProfile을 기반으로 DB에 사용자 정보 저장/조회 처리
         // 제공받은 정보를 기반으로 비교하는 로직이 필봄
 
