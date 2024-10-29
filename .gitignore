@@ -2,6 +2,9 @@
 
 config.json
 
+# WebStorm
+.idea
+
 # below this line is automatically generated.
 
 # Created by https://www.toptal.com/developers/gitignore/api/macos,windows,linux,node,react
