@@ -28,7 +28,7 @@ const Inquiry = sequelize.define(
     created_at: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: DataTypes.NOW,
+      defaultValue: DataTypes.NOW, // TODO : fix
     },
     updated_at: {
       type: DataTypes.DATE,
@@ -39,7 +39,7 @@ const Inquiry = sequelize.define(
   {
     tableName: "inquiry",
     timestamps: false,
-  }
+  },
 );
 
 module.exports = Inquiry;

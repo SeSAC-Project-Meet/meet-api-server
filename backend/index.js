@@ -4,6 +4,7 @@ const morgan = require("morgan");
 const passport = require("passport");
 const { Server } = require("socket.io");
 const http = require("http");
+const path = require("path");
 
 const { PORT } = require("./config.json").development;
 
@@ -32,14 +33,22 @@ function logger(req, res, next) {
   };
 
   res.send(logText); // 주석처리 해제 안하면 crash .. 확인용 코드라 그럼
-  // console.log(logText);
+  console.log(logText);
   next();
 }
 
 // Middleware to log all incoming requests using morgan
-app.use(morgan("combined"));
+app.use((req, res, next) => {
+  if (process.env.NODE_ENV === "production") {
+    morgan("combined")(req, res, next);
+  } else {
+    morgan("dev")(req, res, next);
+  }
+});
 app.use(logger);
+app.use("/", express.static(path.join(__dirname, "public")));
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 // Passport 초기화
 app.use(passport.initialize());
