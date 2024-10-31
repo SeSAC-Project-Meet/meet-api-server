@@ -1,17 +1,16 @@
 const express = require("express");
 const cors = require("cors");
-
-const { PORT } = require("./config.json").development;
-
 const morgan = require("morgan");
 const passport = require("passport");
+const { Server } = require("socket.io");
+const http = require("http");
+const path = require("path");
+
+const { PORT } = require("./config.json").development;
 
 const authRoutes = require("./auth/index.js");
 const inquiryRouter = require("./inquiry");
 const chatRoutes = require("./chat/index.js");
-
-const { Server } = require("socket.io");
-const http = require("http");
 
 const app = express();
 
@@ -20,7 +19,6 @@ const corsOptions = {
   credentials: true,
 };
 
-app.use(express.json());
 app.use(cors(corsOptions));
 
 function logger(req, res, next) {
@@ -34,24 +32,29 @@ function logger(req, res, next) {
     ip: req.ip,
   };
 
-  // res.send(logText); // 주석처리 해제 안하면 crash .. 확인용 코드라 그럼
+  res.send(logText); // 주석처리 해제 안하면 crash .. 확인용 코드라 그럼
   console.log(logText);
   next();
 }
 
 // Middleware to log all incoming requests using morgan
-app.use(morgan("combined"));
+app.use((req, res, next) => {
+  if (process.env.NODE_ENV === "production") {
+    morgan("combined")(req, res, next);
+  } else {
+    morgan("dev")(req, res, next);
+  }
+});
 app.use(logger);
-
-// JSON 요청 본문 파싱 미들웨어를 먼저 사용
+app.use("/", express.static(path.join(__dirname, "public")));
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 // Passport 초기화
 app.use(passport.initialize());
 require("./passport-setup");
 
 app.use("/auth", authRoutes);
-
 app.use("/inquiry", inquiryRouter);
 
 const server = app.listen(PORT, () => {

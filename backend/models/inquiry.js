@@ -25,20 +25,21 @@ const Inquiry = sequelize.define(
       type: DataTypes.STRING(1024),
       allowNull: true,
     },
-    // question: {
-    //   type: DataTypes.STRING,
-    //   allowNull: false,
-    // },
-    // answer: {
-    //   type: DataTypes.STRING,
-    //   allowNull: true,
-    // },
-    // 컬럼 추가 및 변경 필요
+    created_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW, // TODO : fix
+    },
+    updated_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
   },
   {
     tableName: "inquiry",
-    timestamps: false, // TODO : 테이블 변경 후 수정 필요
-  }
+    timestamps: false,
+  },
 );
 
 module.exports = Inquiry;
