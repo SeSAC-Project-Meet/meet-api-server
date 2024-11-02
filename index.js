@@ -3,22 +3,16 @@ const express = require("express");
 const cors = require("cors");
 const logger = require("./logger");
 
-
 const morgan = require("morgan");
-const passport = require("passport");
-
 
 const passport = require("passport");
 const { Server } = require("socket.io");
-const http = require("http");
-const path = require("path");
 
 const { PORT } = require("./config.json").development;
 
 const authRoutes = require("./auth/index.js");
 const inquiryRouter = require("./inquiry");
 const chatRoutes = require("./chat/index.js");
-
 
 const app = express();
 
@@ -52,7 +46,6 @@ app.use(customlogger);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-
 // Passport 초기화
 app.use(passport.initialize());
 require("./passport-setup");
@@ -65,15 +58,12 @@ app.get("/main", (req, res) => {
   res.send("Main Page");
 });
 
-
 const server = app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
-
 
 const io = new Server(server, {
   cors: corsOptions,
 });
 
 chatRoutes(io);
-

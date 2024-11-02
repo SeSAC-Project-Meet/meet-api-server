@@ -13,7 +13,6 @@ const jwt = require("jsonwebtoken");
 const { User } = require("./models/User"); // User 모델 경로
 const getUserbyEmail = require("./models/getUserbyEmail");
 
-
 const opts = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
   secretOrKey: config.development.JWT_SECRET,
@@ -117,3 +116,5 @@ passport.use(
     }
   )
 );
+
+console.log("passport-setup.js loaded");
