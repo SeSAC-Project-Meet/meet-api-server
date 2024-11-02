@@ -1,5 +1,5 @@
 const sequelize = require("./connectToDB");
-const { DataTypes } = require("sequelize");
+const { DataTypes, Sequelize } = require("sequelize");
 
 /**
  * Tests the connection to the database.
@@ -16,24 +16,6 @@ async function testConnection() {
   }
 }
 
-/**
- * Defines the User model with the following fields:
- *
- * @typedef {Object} User
- * @property {number} user_id - The unique identifier for the user. Auto-incremented primary key.
-
- * @property {Date} created_at - The date and time when the user was created. Defaults to the current date and time.
- * @property {Date} updated_at - The date and time when the user was last updated. Defaults to the current date and time.
- * @property {string} name - The name of the user. Maximum length of 30 characters.
- * @property {string} nickname - The nickname of the user. Maximum length of 15 characters.
- * @property {Date} birthdate - The birthdate of the user. Stored as a date only.
- * @property {string} email - The email address of the user. Maximum length of 200 characters.
- * @property {string} phone_number - The phone number of the user. Maximum length of 30 characters.
- *
- * @param {import('sequelize').Sequelize} sequelize - The Sequelize instance.
- * @param {import('sequelize').DataTypes} DataTypes - The Sequelize DataTypes.
- * @returns {import('sequelize').Model} The User model.
- */
 const User = sequelize.define(
   "User",
   {
@@ -42,44 +24,39 @@ const User = sequelize.define(
       autoIncrement: true,
       primaryKey: true,
     },
-    created_at: {
-      type: DataTypes.DATE(6),
+    username: {
+      type: DataTypes.STRING(50),
       allowNull: false,
-      defaultValue: DataTypes.NOW,
+      unique: true,
     },
-    updated_at: {
-      type: DataTypes.DATE(6),
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
-    name: {
-      type: DataTypes.STRING(30),
-      allowNull: false,
-    },
-    nickname: {
-      type: DataTypes.STRING(15),
-      allowNull: false,
-    },
-    birthdate: {
-      type: DataTypes.DATEONLY,
+    password: {
+      type: DataTypes.STRING(100),
       allowNull: false,
     },
     email: {
-      type: DataTypes.STRING(200),
+      type: DataTypes.STRING(100),
       allowNull: false,
+      unique: true,
     },
     phone_number: {
-      type: DataTypes.STRING(30),
+      type: DataTypes.STRING(40),
       allowNull: false,
     },
-    password: {
-      type: DataTypes.STRING(200),
+    created_at: {
+      type: DataTypes.DATE(6),
+      defaultValue: Sequelize.fn("CURRENT_TIMESTAMP", 6),
       allowNull: false,
+    },
+    updated_at: {
+      type: DataTypes.DATE(6),
+      defaultValue: Sequelize.fn("CURRENT_TIMESTAMP", 6),
+      allowNull: false,
+      onUpdate: Sequelize.fn("CURRENT_TIMESTAMP", 6),
     },
   },
   {
-    tableName: "user", // 사용할 테이블 이름
-    timestamps: false, // createdAt, updatedAt 필드 자동 생성 비활성화
+    tableName: "user",
+    timestamps: false, // If you want to manage created_at and updated_at manually
   }
 );
 

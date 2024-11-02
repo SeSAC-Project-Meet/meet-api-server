@@ -6,7 +6,7 @@ const KakaoStrategy = require("passport-oauth2").Strategy;
 const axios = require("axios");
 
 // passport-local의 LocalStrategy와 passport-jwt의 JWTStrategy를 각각 올바르게 가져옴
-const config = require("./config.json");
+const config = require("./config.json").development;
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -15,12 +15,11 @@ const getUserbyEmail = require("./models/getUserbyEmail");
 
 const opts = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: config.development.JWT_SECRET,
+  secretOrKey: config.JWT_SECRET,
 };
 
 passport.use(
   // TODO : JWT 유효성 검증을 안하는데?
-
   "jwt",
   new JWTStrategy(opts, async (jwt_payload, done) => {
     try {
@@ -39,9 +38,10 @@ passport.use(
 passport.use(
   "local",
   new LocalStrategy(
-    { usernameField: "phone_number", passwordField: "password" },
-    async (phone_number, password, done) => {
-      const user = await User.findOne({ where: { phone_number } });
+    { usernameField: "loginID", passwordField: "password" },
+    async (loginID, password, done) => {
+      console.log("🚀 ~ loginId:", loginID, password);
+      const user = await User.findOne({ where: { phone_number: loginID } });
       if (user && (await bcrypt.compare(password, user.password))) {
         // console.log("🚀 ~ user:", user);
         return done(null, user);
@@ -57,9 +57,9 @@ passport.use(
     {
       authorizationURL: "https://kauth.kakao.com/oauth/authorize",
       tokenURL: "https://kauth.kakao.com/oauth/token",
-      clientID: config.development.KAKAO_REST_API_KEY, // 카카오 앱 키
+      clientID: config.KAKAO_REST_API_KEY, // 카카오 앱 키
       callbackURL: "/auth/kakao/callback", // 설정한 Redirect URI
-      clientSecret: config.development.KAKAO_CLIENT_SECRET, // 카카오 앱 시크릿
+      clientSecret: config.KAKAO_CLIENT_SECRET, // 카카오 앱 시크릿
       scope: ["profile_nickname", "profile_image", "account_email", "openid"],
     },
     // verify callback
@@ -76,11 +76,6 @@ passport.use(
             },
           }
         );
-
-        // console.log(profile); // returns nothing
-        // console.log("Access Token:", accessToken);
-        // console.log("Refresh Token:", refreshToken);
-        // console.log("Profile:", profile);
 
         const kakaoUserProfile = kakaoProfileRes.data;
         console.log(
@@ -100,8 +95,9 @@ passport.use(
 
         const user_id = await getUserbyEmail(kakaoUserProfileParsed.email);
         if (!user_id) {
-          done(null, false, {
-            message: "User not found}",
+          return done(null, false, {
+            message: "User not found",
+            kakao_user_profile: kakaoUserProfileParsed,
           });
           // throw new Error("User not found");
         }
@@ -110,8 +106,7 @@ passport.use(
         done(null, userInfo); // user_id를 parse해서 돌려보냄
       } catch (error) {
         console.log("[passport-setup : kakao] Error : ", error);
-
-        done(error, null);
+        return done(error, null);
       }
     }
   )
