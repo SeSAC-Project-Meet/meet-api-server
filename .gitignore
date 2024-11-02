@@ -1,6 +1,10 @@
 # Created for this project
 
 config.json
+/backend/uploads
+
+# WebStorm
+.idea
 
 # below this line is automatically generated.
 

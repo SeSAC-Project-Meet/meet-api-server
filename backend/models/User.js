@@ -21,6 +21,7 @@ async function testConnection() {
  *
  * @typedef {Object} User
  * @property {number} user_id - The unique identifier for the user. Auto-incremented primary key.
+
  * @property {Date} created_at - The date and time when the user was created. Defaults to the current date and time.
  * @property {Date} updated_at - The date and time when the user was last updated. Defaults to the current date and time.
  * @property {string} name - The name of the user. Maximum length of 30 characters.
