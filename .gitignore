@@ -1,7 +1,7 @@
 # Created for this project
 
 config.json
-/backend/uploads
+/uploads
 
 # WebStorm
 .idea
