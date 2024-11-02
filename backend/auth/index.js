@@ -6,7 +6,9 @@ const jwt = require("jsonwebtoken");
 const config = require("../config.json");
 
 const passport = require("passport");
+
 const createJWT = require("./createJWT");
+
 
 /*
 create table project_meet.user
@@ -24,6 +26,7 @@ create table project_meet.user
 );
 */
 
+
 auth.get(
   "/user",
   passport.authenticate("jwt", { session: false }),
@@ -36,6 +39,7 @@ auth.get(
     }
   }
 );
+
 
 // 24/10/26 01:35 개발 끝
 auth.post("/register", async (req, res) => {

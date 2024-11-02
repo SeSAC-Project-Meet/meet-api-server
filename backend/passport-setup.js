@@ -13,6 +13,7 @@ const jwt = require("jsonwebtoken");
 const { User } = require("./models/User"); // User 모델 경로
 const getUserbyEmail = require("./models/getUserbyEmail");
 
+
 const opts = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
   secretOrKey: config.development.JWT_SECRET,
@@ -20,6 +21,7 @@ const opts = {
 
 passport.use(
   // TODO : JWT 유효성 검증을 안하는데?
+
   "jwt",
   new JWTStrategy(opts, async (jwt_payload, done) => {
     try {
@@ -109,6 +111,7 @@ passport.use(
         done(null, userInfo); // user_id를 parse해서 돌려보냄
       } catch (error) {
         console.log("[passport-setup : kakao] Error : ", error);
+
         done(error, null);
       }
     }

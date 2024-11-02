@@ -21,37 +21,26 @@ async function testConnection() {
  *
  * @typedef {Object} User
  * @property {number} user_id - The unique identifier for the user. Auto-incremented primary key.
- * @property {string} username - The username of the user. Maximum length of 50 characters. Unique.
- * @property {string} password - The password of the user. Maximum length of 100 characters.
- * @property {string} email - The email address of the user. Maximum length of 100 characters. Unique.
+
  * @property {Date} created_at - The date and time when the user was created. Defaults to the current date and time.
  * @property {Date} updated_at - The date and time when the user was last updated. Defaults to the current date and time.
+ * @property {string} name - The name of the user. Maximum length of 30 characters.
+ * @property {string} nickname - The nickname of the user. Maximum length of 15 characters.
+ * @property {Date} birthdate - The birthdate of the user. Stored as a date only.
+ * @property {string} email - The email address of the user. Maximum length of 200 characters.
+ * @property {string} phone_number - The phone number of the user. Maximum length of 30 characters.
  *
  * @param {import('sequelize').Sequelize} sequelize - The Sequelize instance.
  * @param {import('sequelize').DataTypes} DataTypes - The Sequelize DataTypes.
  * @returns {import('sequelize').Model} The User model.
  */
 const User = sequelize.define(
-  "user",
+  "User",
   {
     user_id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
-    },
-    username: {
-      type: DataTypes.STRING(50),
-      allowNull: false,
-      unique: true,
-    },
-    password: {
-      type: DataTypes.STRING(100),
-      allowNull: false,
-    },
-    email: {
-      type: DataTypes.STRING(100),
-      allowNull: false,
-      unique: true,
     },
     created_at: {
       type: DataTypes.DATE(6),
@@ -62,6 +51,30 @@ const User = sequelize.define(
       type: DataTypes.DATE(6),
       allowNull: false,
       defaultValue: DataTypes.NOW,
+    },
+    name: {
+      type: DataTypes.STRING(30),
+      allowNull: false,
+    },
+    nickname: {
+      type: DataTypes.STRING(15),
+      allowNull: false,
+    },
+    birthdate: {
+      type: DataTypes.DATEONLY,
+      allowNull: false,
+    },
+    email: {
+      type: DataTypes.STRING(200),
+      allowNull: false,
+    },
+    phone_number: {
+      type: DataTypes.STRING(30),
+      allowNull: false,
+    },
+    password: {
+      type: DataTypes.STRING(200),
+      allowNull: false,
     },
   },
   {
