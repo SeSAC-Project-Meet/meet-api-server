@@ -11,6 +11,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const { User } = require("./models/User"); // User 모델 경로
+const getUserbyEmail = require("./models/getUserbyEmail");
 
 const opts = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -18,12 +19,13 @@ const opts = {
 };
 
 passport.use(
+  // TODO : JWT 유효성 검증을 안하는데?
   "jwt",
   new JWTStrategy(opts, async (jwt_payload, done) => {
     try {
       const user = await User.findByPk(jwt_payload.user_id); // payload에서 user_id로 사용자 찾기
       if (user) {
-        return done(null, user.user_id);
+        return done(null, user);
       } else {
         return done(null, false);
       }
@@ -64,25 +66,49 @@ passport.use(
       console.log("🚀 ~ CALLED");
       console.log(params);
       try {
-        const response = await axios.get("https://kapi.kakao.com/v2/user/me", {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
-          },
-        });
+        const kakaoProfileRes = await axios.get(
+          "https://kapi.kakao.com/v2/user/me",
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
+            },
+          }
+        );
 
-        console.log(profile);
+        // console.log(profile); // returns nothing
         // console.log("Access Token:", accessToken);
         // console.log("Refresh Token:", refreshToken);
         // console.log("Profile:", profile);
 
-        const userProfile = response.data;
-        console.log("🚀 ~ userProfile:", userProfile);
+        const kakaoUserProfile = kakaoProfileRes.data;
+        console.log(
+          "[passport-setup : kakao] KakaoUserProfile : ",
+          kakaoUserProfile
+        );
         // 여기서 userProfile을 기반으로 DB에 사용자 정보 저장/조회 처리
         // 제공받은 정보를 기반으로 비교하는 로직이 필봄
 
-        done(null, userProfile); // 우선 어떻게 담겨오는지 확인하기 위해 넣어봄
+        const kakaoUserProfileParsed = {
+          kakao_id_token: params.id_token,
+          nickname: kakaoUserProfile.kakao_account.profile.nickname,
+          profile_image_url:
+            kakaoUserProfile.kakao_account.profile.profile_image_url,
+          email: kakaoUserProfile.kakao_account.email,
+        };
+
+        const user_id = await getUserbyEmail(kakaoUserProfileParsed.email);
+        if (!user_id) {
+          done(null, false, {
+            message: "User not found}",
+          });
+          // throw new Error("User not found");
+        }
+        const userInfo = { ...kakaoUserProfileParsed, user_id: user_id };
+        console.log("[passport-setup : kakao] Final User Info : ", userInfo);
+        done(null, userInfo); // user_id를 parse해서 돌려보냄
       } catch (error) {
+        console.log("[passport-setup : kakao] Error : ", error);
         done(error, null);
       }
     }

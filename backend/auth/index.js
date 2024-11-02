@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const config = require("../config.json");
 
 const passport = require("passport");
+const createJWT = require("./createJWT");
 
 /*
 create table project_meet.user
@@ -22,6 +23,19 @@ create table project_meet.user
     password     varchar(30)  not null
 );
 */
+
+auth.get(
+  "/user",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    console.log("auth/user check, is user : " + !!req.user);
+    if (req.user) {
+      return res.status(200).json({ user: req.user });
+    } else {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+  }
+);
 
 // 24/10/26 01:35 개발 끝
 auth.post("/register", async (req, res) => {
@@ -93,27 +107,105 @@ auth.post(
 
 // 24/10/26 01:52 개발 끝
 // 카카오 OAuth 관련, 아래에 응답 첨부함.
-
 auth.get("/kakao", passport.authenticate("kakao"));
 
-// 카카오 로그인 콜백 처리
-auth.get(
-  "/kakao/callback",
-  passport.authenticate("kakao", {
-    session: false,
-    failureRedirect: "/auth/kakao",
-    successReturnToOrRedirect: "/main",
-  }),
-  (req, res) => {
-    console.log("CALLBACK REQUEST");
-    console.log(req.headers, req.cookies);
-    // 로그인 성공 후의 처리
-    console.log("Kakao login success:", req.user);
+auth.get("/kakao/callback", (req, res) => {
+  passport.authenticate("kakao", { session: false }, (err, user, info) => {
+    if (err) {
+      console.log("[auth/kakao/callback] Error: ", err);
+      return; // 에러가 발생하면 다음 미들웨어로 넘깁니다.
+    }
+
+    if (!user) {
+      // 인증 실패 시
+      return res
+        .status(401)
+        .send(
+          `<script>window.opener.postMessage({ error: 'Authentication failed' }, '*'); window.close();</script>`
+        );
+    }
+
+    console.log("Kakao login success:", user);
+    const cookieOptions = {
+      maxAge: 1000 * 60 * 60 * 24 * 1, // 1 day
+      // httpOnly: true,
+      sameSite: "strict",
+    };
+
+    const createdToken = createJWT(user.user_id);
+
     return res
-      .status(200)
-      .json({ message: "Kakao login successful", user: req.user });
-  }
-);
+      .cookie("MEET_ACCESS_TOKEN", createdToken, cookieOptions)
+      .send(
+        `<script>window.opener.postMessage({ user: ${JSON.stringify(user)} }, '*'); window.close();</script>`
+      );
+    // .json({ user: user })
+    // .redirect(config.development.KAKAO_REDIRECT_URI);
+  })(req, res);
+}); // 미들웨어 실행
+
+// auth.get("/kakao/callback", (req, res, next) => {
+//   passport.authenticate("kakao", {
+//     session: false,
+//     // failureRedirect: config.development.KAKAO_REDIRECT_FAILURE,
+//     // successRedirect: config.development.KAKAO_REDIRECT_URI,
+//   })(req, res, (err) => {
+//     if (err) {
+//       console.log("ERR : ", err);
+//       return; // 에러가 있으면 다음 미들웨어로 전달
+//     }
+
+//     // 이곳은 인증 후 처리 부분입니다.
+//     if (!req.user) {
+//       return res.status(401).json({ message: "Authentication failed" });
+//     }
+
+//     console.log("REQ :", req);
+//     console.log("Kakao login success:", req.user);
+
+//     const cookieOptions = {
+//       maxAge: 1000 * 60 * 60 * 24 * 1, // 1 day
+//       httpOnly: true,
+//       sameSite: "strict",
+//     };
+
+//     return res
+//       .cookie("MEET_ACCESS_TOKEN", createJWT(req.user.user_id), cookieOptions)
+//       .redirect(config.development.KAKAO_REDIRECT_URI);
+//   });
+// });
+
+// 카카오 로그인 콜백 처리
+// auth.get(
+//   "/kakao/callback",
+//   passport.authenticate(
+//     "kakao",
+//     {
+//       session: false,
+//       failureRedirect: config.development.KAKAO_REDIRECT_FAILURE,
+//       // successRedirect: config.development.KAKAO_REDIRECT_URI,
+//     },
+//     (err) => {
+//       console.log("ERR : ", err);
+//     }
+//   ),
+//   (req, res) => {
+//     // console.log("CALLBACK REQUEST");
+//     // console.log(req.headers, req.cookies);
+//     // 로그인 성공 후의 처리
+
+//     console.log("REQ :", req);
+//     console.log("Kakao login success:", req.user);
+//     const cookieOptions = {
+//       maxAge: 1000 * 60 * 60 * 24 * 1, // 1 days
+//       httpOnly: true,
+//       sameSite: "strict",
+//     };
+//     return res
+//       .cookie("MEET_ACCESS_TOKEN", createJWT(req.user.user_id), cookieOptions)
+//       .redirect(config.development.KAKAO_REDIRECT_URI);
+//   }
+// );
 
 /*
 req.user은 다음과 같음
