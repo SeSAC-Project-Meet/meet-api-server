@@ -1,4 +1,4 @@
-const { User } = require("../models/User");
+const User = require("../models/define/User");
 
 const checkUniqueEmail = async (email) => {
   try {

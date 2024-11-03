@@ -1,4 +1,4 @@
-const { User, registerUser } = require("../models/User");
+const registerUser = require("../models/user/registerUser");
 const bcrypt = require("bcrypt");
 const config = require("../config.json").development;
 

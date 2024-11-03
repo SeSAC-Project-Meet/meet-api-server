@@ -9,7 +9,7 @@ const axios = require("axios");
 const config = require("./config.json").development;
 const bcrypt = require("bcrypt");
 
-const { User } = require("./models/User"); // User 모델 경로
+const User = require("./models/define/User"); // User 모델 경로
 const getUserbyEmail = require("./models/getUserbyEmail");
 
 const opts = {
