@@ -28,7 +28,7 @@ const customlogger = (req, res, next) => {
     url: req.url,
     method: req.method,
     time: new Date(),
-    headers: req.headers,
+    host: req.headers.host,
     body: req.body,
     ip: req.ip,
   };

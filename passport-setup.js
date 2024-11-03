@@ -93,17 +93,18 @@ passport.use(
           email: kakaoUserProfile.kakao_account.email,
         };
 
-        const user_id = await getUserbyEmail(kakaoUserProfileParsed.email);
-        if (!user_id) {
+        const user = await getUserbyEmail(kakaoUserProfileParsed.email);
+        if (!user) {
           return done(null, false, {
             message: "User not found",
-            kakao_user_profile: kakaoUserProfileParsed,
+            user: kakaoUserProfileParsed,
           });
           // throw new Error("User not found");
+        } else {
+          const userInfo = { ...kakaoUserProfileParsed, ...user };
+          console.log("[passport-setup : kakao] Final User Info : ", userInfo);
+          return done(null, userInfo); // user_id를 parse해서 돌려보냄
         }
-        const userInfo = { ...kakaoUserProfileParsed, user_id: user_id };
-        console.log("[passport-setup : kakao] Final User Info : ", userInfo);
-        done(null, userInfo); // user_id를 parse해서 돌려보냄
       } catch (error) {
         console.log("[passport-setup : kakao] Error : ", error);
         return done(error, null);

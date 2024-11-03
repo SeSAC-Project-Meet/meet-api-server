@@ -1,17 +1,12 @@
 const express = require("express");
 const auth = express.Router();
-const { User, registerUser } = require("../models/User");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const config = require("../config.json").development;
-
 const passport = require("passport");
 
-const createJWT = require("./createJWT");
 const handleGetUser = require("./handleGetUser");
 const handleRegister = require("./handleRegister");
 const handleLogin = require("./handleLogin");
 const handleKakaoCallback = require("./handleKakaoCallback");
+const handleCheckUnique = require("./handleCheckUnique");
 
 auth.get(
   "/user",
@@ -21,6 +16,7 @@ auth.get(
 
 // 24/10/26 01:35 개발 끝
 auth.post("/register", handleRegister);
+auth.post("/check-unique", handleCheckUnique);
 
 // 24/10/26 01:35 개발 끝
 auth.post(

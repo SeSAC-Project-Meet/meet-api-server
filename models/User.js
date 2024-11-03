@@ -97,8 +97,14 @@ async function registerUser(userData) {
     });
 
     if (existingUser) {
-      console.log("User already exists with this email:", userData.email);
-      return { status: 409, message: "User already exists with this email" };
+      console.log(
+        "User already exists with this phone_number:",
+        userData.phone_number
+      );
+      return {
+        status: 409,
+        message: `User already exists with this phone_number : ${userData.phone_number}`,
+      };
     }
 
     // 유저가 존재하지 않으면 새 유저 생성

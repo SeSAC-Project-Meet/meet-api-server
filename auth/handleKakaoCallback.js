@@ -14,7 +14,7 @@ const handleKakaoCallback = (req, res) => {
       return res
         .status(401)
         .send(
-          `<script>window.opener.postMessage({ user: ${JSON.stringify(info)} }, '${config.FRONTEND_URL}'); window.close();</script>`
+          `<script>window.opener.postMessage({ not_registered_user : ${JSON.stringify(info)} }, '${config.FRONTEND_URL}'); window.close();</script>`
         );
     }
 
@@ -28,6 +28,7 @@ const handleKakaoCallback = (req, res) => {
     const createdToken = createJWT(user.user_id);
 
     return res
+      .status(200)
       .cookie("MEET_ACCESS_TOKEN", createdToken, cookieOptions)
       .send(
         `<script>window.opener.postMessage({ user: ${JSON.stringify(user)} }, '${config.FRONTEND_URL}'); window.close();</script>`
