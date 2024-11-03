@@ -2,7 +2,7 @@ const Term = require("../define/Term.js");
 
 const getTerms = async () => {
   const terms = await Term.findAll({
-    attributes: ["term_id", "title", "content"],
+    attributes: ["term_id", "title", "content", "is_required"],
   });
 
   return terms;

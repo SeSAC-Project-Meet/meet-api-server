@@ -4,13 +4,16 @@ const { DataTypes, Sequelize } = require("sequelize");
 /*
 create table project_meet.term
 (
-    term_id    int auto_increment
+    term_id     int auto_increment
         primary key,
-    title      varchar(1024)                             not null,
-    content    varchar(4096)                             not null,
-    created_at timestamp(6) default CURRENT_TIMESTAMP(6) not null,
-    updated_at timestamp(6) default CURRENT_TIMESTAMP(6) not null on update CURRENT_TIMESTAMP(6)
+    title       varchar(1024)                             not null,
+    content     varchar(4096)                             not null,
+    is_required tinyint(1)                                not null,
+    created_at  timestamp(6) default CURRENT_TIMESTAMP(6) not null,
+    updated_at  timestamp(6) default CURRENT_TIMESTAMP(6) not null on update CURRENT_TIMESTAMP(6)
 );
+
+
 */
 
 const Term = sequelize.define(
@@ -27,6 +30,10 @@ const Term = sequelize.define(
     },
     content: {
       type: DataTypes.STRING(4096),
+      allowNull: false,
+    },
+    is_required: {
+      type: DataTypes.BOOLEAN,
       allowNull: false,
     },
     created_at: {
