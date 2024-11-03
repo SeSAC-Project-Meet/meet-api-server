@@ -7,6 +7,9 @@ const handleRegister = require("./handleRegister");
 const handleLogin = require("./handleLogin");
 const handleKakaoCallback = require("./handleKakaoCallback");
 const handleCheckUnique = require("./handleCheckUnique");
+const handleGetTerms = require("./handleGetTerms");
+
+auth.get("/terms", handleGetTerms);
 
 auth.get(
   "/user",
@@ -27,7 +30,7 @@ auth.post(
 
 // 24/10/26 01:52 개발 끝
 // 카카오 OAuth 관련, 아래에 응답 첨부함.
-auth.get("/kakao", passport.authenticate("kakao"));
+auth.get("/kakao", passport.authenticate("kakao", { session: false }));
 auth.get("/kakao/callback", handleKakaoCallback); // 미들웨어 실행
 
 /*

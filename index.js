@@ -13,8 +13,11 @@ const { PORT } = require("./config.json").development;
 const authRoutes = require("./auth/index.js");
 const inquiryRouter = require("./inquiry");
 const chatRoutes = require("./chat/index.js");
+const cookieParser = require("cookie-parser");
 
 const app = express();
+
+app.use(cookieParser());
 
 const corsOptions = {
   origin: "http://localhost:5173",
@@ -30,6 +33,7 @@ const customlogger = (req, res, next) => {
     time: new Date(),
     host: req.headers.host,
     body: req.body,
+    cookie: req.cookies,
     ip: req.ip,
   };
 

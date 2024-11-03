@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const createJWT = require("./createJWT");
 const config = require("../config.json").development;
 
 const handleLogin = async (req, res) => {
@@ -7,18 +8,17 @@ const handleLogin = async (req, res) => {
 
   if (req.user) {
     console.log("[handleLogin] user_id : " + req.user.user_id);
-    const token = jwt.sign({ user_id: req.user.user_id }, config.JWT_SECRET, {
-      expiresIn: "1h",
-    });
-    console.log("Login success");
+    const createdToken = createJWT(req.user.user_id);
+    console.log("Login success, Token :", createdToken);
     const { user_id, username } = req.user;
+    const cookieOptions = {
+      maxAge: 1000 * 60 * 60 * 24 * 1, // 1 day
+      httpOnly: true,
+      sameSite: "strict",
+    };
     return res
       .status(200)
-      .cookie("MEET_USER_TOKEN", token, {
-        httpOnly: true,
-        sameSite: "strict",
-        maxAge: 3600000,
-      })
+      .cookie("MEET_ACCESS_TOKEN", createdToken, cookieOptions)
       .json({ user: { user_id, username }, message: "Login success" });
   } else {
     console.log("Login failed");

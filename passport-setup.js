@@ -8,22 +8,32 @@ const axios = require("axios");
 // passport-local의 LocalStrategy와 passport-jwt의 JWTStrategy를 각각 올바르게 가져옴
 const config = require("./config.json").development;
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 
 const { User } = require("./models/User"); // User 모델 경로
 const getUserbyEmail = require("./models/getUserbyEmail");
 
 const opts = {
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: config.JWT_SECRET,
+  jwtFromRequest: ExtractJwt.fromExtractors([
+    (req) => {
+      let token = null;
+      if (req.cookies) {
+        token = req.cookies.MEET_ACCESS_TOKEN; // 쿠키에서 JWT를 가져옵니다.
+        console.log("[passport-setup] JWT from cookie : ", token);
+      }
+      return token;
+    },
+  ]),
+  secretOrKey: config.JWT_SECRET, // 비밀 키 설정
 };
 
 passport.use(
-  // TODO : JWT 유효성 검증을 안하는데?
+  // TODO : JWT 유효성 검증을 안하는데? ; 응 하고 있어 opts ...
   "jwt",
   new JWTStrategy(opts, async (jwt_payload, done) => {
+    console.log("[passport-setup] jwt_payload : ", jwt_payload);
     try {
       const user = await User.findByPk(jwt_payload.user_id); // payload에서 user_id로 사용자 찾기
+      console.log("[passport-setup] user_id in JWT payload: ", user);
       if (user) {
         return done(null, user);
       } else {
