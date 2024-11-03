@@ -8,8 +8,11 @@ const handleLogin = require("./handleLogin");
 const handleKakaoCallback = require("./handleKakaoCallback");
 const handleCheckUnique = require("./handleCheckUnique");
 const handleGetTerms = require("./handleGetTerms");
+const handleAddTerms = require("./handleAddTerms");
 
 auth.get("/terms", handleGetTerms);
+// TODO: 다른 서버빼던, ip제한이던 해야합니다.
+auth.post("/terms", handleAddTerms);
 
 auth.get(
   "/user",
