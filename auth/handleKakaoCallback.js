@@ -20,7 +20,7 @@ const handleKakaoCallback = (req, res) => {
 
     console.log("Kakao login success:", user);
     const cookieOptions = {
-      maxAge: 1000 * 60 * 60 * 24 * 1, // 1 day
+      maxAge: 1000 * 60 * 5, // 1 day
       httpOnly: true,
       sameSite: "strict",
     };

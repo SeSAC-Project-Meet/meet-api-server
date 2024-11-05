@@ -9,7 +9,6 @@ const client = new SNSClient({
   },
 });
 
-
 const sendSMS = async (text, number) => {
   const params = {
     Message: text,
@@ -25,4 +24,4 @@ const sendSMS = async (text, number) => {
   }
 };
 
-module.exports = { sendSMS };
+module.exports = sendSMS;

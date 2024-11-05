@@ -28,6 +28,7 @@ const opts = {
 
 passport.use(
   // TODO : JWT 유효성 검증을 안하는데? ; 응 하고 있어 opts ...
+  // 참고로 여기서 유효한 opts를 거쳤을 떄 유효한 토큰이 아니면 아래 함수는 실행되지도 않음
   "jwt",
   new JWTStrategy(opts, async (jwt_payload, done) => {
     console.log("[passport-setup] jwt_payload : ", jwt_payload);
@@ -40,6 +41,7 @@ passport.use(
         return done(null, false);
       }
     } catch (error) {
+      console.log("[passport-setup] JWT Error : ", error);
       return done(error, false);
     }
   })

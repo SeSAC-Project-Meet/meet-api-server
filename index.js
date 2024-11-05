@@ -6,14 +6,14 @@ const logger = require("./logger");
 const morgan = require("morgan");
 
 const passport = require("passport");
-const { Server } = require("socket.io");
+const cookieParser = require("cookie-parser");
 
+const { Server } = require("socket.io");
 const { PORT } = require("./config.json").development;
 
 const authRoutes = require("./auth/index.js");
 const inquiryRouter = require("./inquiry");
-const chatRoutes = require("./chat/index.js");
-const cookieParser = require("cookie-parser");
+const { chat, chatSocketRouter } = require("./chat/index.js");
 
 const app = express();
 
@@ -58,9 +58,7 @@ app.use("/auth", authRoutes);
 
 app.use("/inquiry", inquiryRouter);
 
-app.get("/main", (req, res) => {
-  res.send("Main Page");
-});
+app.use("/chat", chat);
 
 const server = app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
@@ -68,6 +66,7 @@ const server = app.listen(PORT, () => {
 
 const io = new Server(server, {
   cors: corsOptions,
+  cookie: true,
 });
 
-chatRoutes(io);
+chatSocketRouter(io);

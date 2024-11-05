@@ -17,7 +17,7 @@ create table project_meet.term
 */
 
 const Term = sequelize.define(
-  "Term",
+  "term",
   {
     term_id: {
       type: DataTypes.INTEGER,

@@ -2,7 +2,7 @@ const sequelize = require("../connectToDB");
 const { DataTypes, Sequelize } = require("sequelize");
 
 const User = sequelize.define(
-  "User",
+  "user",
   {
     user_id: {
       type: DataTypes.INTEGER,

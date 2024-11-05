@@ -1,33 +1,96 @@
-function chatRoutes(io) {
-  console.log("chatRoutes loaded");
+const passport = require("passport");
+const express = require("express");
+const jwt = require("jsonwebtoken");
+const config = require("../config.json").development;
 
-  io.use((socket, next) => {
-    const token = socket.handshake.auth.token; // 클라이언트에서 보낸 토큰 추출
+const chat = express.Router();
 
-    // 여기에서 토큰 검증 로직을 추가
-    if (isValidToken(token)) {
-      next(); // 인증 성공
-    } else {
-      next(new Error("Authentication error")); // 인증 실패
+const handleCreateChatroom = require("./service/handleCreateChatroom");
+const handleGetChatroom = require("./service/handleGetChatroom");
+const handleSocketMessage = require("./service/handleSocketMessage");
+const User_socket = require("../models/define/User_socket");
+const handleGetChatsInChatroom = require("./service/handleGetChatsInChatroom");
+
+const cookie = require("cookie");
+
+const passportOptions = {
+  session: false,
+  // failureMessage: true,
+};
+
+chat.get("/", handleGetChatsInChatroom);
+
+chat.post(
+  "/chatroom",
+  passport.authenticate("jwt", passportOptions),
+  handleCreateChatroom
+);
+
+chat.get(
+  "/chatroom",
+  passport.authenticate("jwt", passportOptions),
+  handleGetChatroom
+);
+
+function chatSocketRouter(io) {
+  console.log("./chat loaded");
+  const chatio = io.of("/chat");
+
+  chatio.use((socket, next) => {
+    const rawToken = socket.request.headers.cookie;
+    if (!rawToken) {
+      console.log("[chatsocket] No cookie");
+      socket.disconnect("No Cookie Provided, Disconnecting");
+      return;
     }
+    const token = cookie.parse(rawToken).MEET_ACCESS_TOKEN;
+    console.log("[socket] Token: ", token);
+
+    if (!token) {
+      console.log("[chatsocket] No token");
+      socket.disconnect("No Token Provided, Disconnecting");
+      return;
+    }
+
+    jwt.verify(token, config.JWT_SECRET, (err, decoded) => {
+      if (err) {
+        console.log("[chatsocket] Invalid token");
+        socket.disconnect("Invalid Token Provided, Disconnecting");
+        return;
+      }
+      socket.user = decoded.user_id; // Store user_id from payload
+      console.log("[chatsocket] User ID: ", socket.user);
+      next();
+    });
   });
 
-  // '/chat' 네임스페이스에서만 소켓 연결을 수신
+  chatio.on("connection", async (socket) => {
+    const recordSocketId = await User_socket.create({
+      user_id: socket.user,
+      socket_id: socket.id,
+      status: true,
+    });
+    console.log("User connected & socket id recorded: ", recordSocketId);
 
-  io.on("connection", (socket) => {
-    console.log("A user connected to /chat namespace");
+    socket.on("message", (data) => handleSocketMessage(socket, data));
 
-    socket.emit("welcome", "Welcome to the chat!");
-
-    socket.on("message", (data) => {
-      console.log("Message from client:", data);
-      socket.emit("message", "Message received on the server.");
+    socket.on("reconnect", () => {
+      console.log("User reconnected to /chat namespace");
     });
 
-    socket.on("disconnect", () => {
-      console.log("User disconnected from /chat namespace");
+    socket.on("disconnect", (reason) => {
+      // disconnect 시에 user_socket에 저장해둔 socket_id 삭제
+      // 이거 await임, socket_id 로 한 이유는 여러 기기에서 접속했을 경우 대비
+      User_socket.destroy({ where: { socket_id: socket.id } })
+        .then((result) => {
+          console.log("User disconnected :", reason);
+          console.log("Deleted socket id record: ", result);
+        })
+        .catch((err) => {
+          console.log("Error deleting socket id record: ", err);
+        });
     });
   });
 }
 
-module.exports = chatRoutes;
+module.exports = { chatSocketRouter, chat };

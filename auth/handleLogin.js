@@ -1,6 +1,4 @@
-const jwt = require("jsonwebtoken");
 const createJWT = require("./createJWT");
-const config = require("../config.json").development;
 
 const handleLogin = async (req, res) => {
   // passport 통해서 들어온거 check
@@ -12,7 +10,7 @@ const handleLogin = async (req, res) => {
     console.log("Login success, Token :", createdToken);
     const { user_id, username } = req.user;
     const cookieOptions = {
-      maxAge: 1000 * 60 * 60 * 24 * 1, // 1 day
+      maxAge: 1000 * 60 * 5, // 5 m
       httpOnly: true,
       sameSite: "strict",
     };
