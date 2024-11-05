@@ -26,7 +26,9 @@ const handleSocketMessage = async (socket, data) => {
       logger.info(`[sendMessageToUsersInChatroom] Result: ${r}`); // 메시지가 성공적으로 전송되었을 때 로그
       return inputMessage(data); // 데이터베이스에 메시지를 저장
     })
-    .then((r) => logger.info(`[inputMessage] Chat: ${JSON.stringify(r)}`)) // 메시지가 성공적으로 저장되었을 때 로그
+    .then((r) => {
+      logger.info(`[inputMessage] Chat: ${JSON.stringify(r.dataValues)}`);
+    }) // 메시지가 성공적으로 저장되었을 때 로그
     .catch((e) => logger.error(e)); // 에러 처리
 };
 

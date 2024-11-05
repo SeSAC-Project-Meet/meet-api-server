@@ -13,10 +13,7 @@ const sendMessageToUsersInChatroom = async (socket, chatroom_id, message) => {
 
   await Promise.all(
     users.map(async (user_id) => {
-      console.log(
-        "asdlfkjas;ldfjasldfkjas;dlfkjasdfjasdfjas;ldfjka;sdfjk: ",
-        user_id
-      );
+      logger.info(`[sendMessageToUsersInChatroom] User ID: ${user_id}`);
       const socket_ids = await getAllSocketIdByUserId(user_id);
 
       if (!socket_ids) {
@@ -28,13 +25,13 @@ const sendMessageToUsersInChatroom = async (socket, chatroom_id, message) => {
             ...message,
             user_id: user_id,
           };
-          logger.info(
-            `[sendMessageToUsersInChatroom] Message: ${JSON.stringify(reply_message)}`
-          );
-          logger.info(
-            `[sendMessageToUsersInChatroom] Socket ID: ${JSON.stringify(socket_id)}`
-          );
           socket.to(socket_id).emit("message", reply_message);
+          logger.info(
+            `[sendMessageToUsersInChatroom] Message: ${JSON.stringify(reply_message)} to Socket ID: ${socket_id}`
+          );
+          // logger.info(
+          //   `[sendMessageToUsersInChatroom] Socket ID: ${JSON.stringify(socket_id)}`
+          // );
         });
       }
     })

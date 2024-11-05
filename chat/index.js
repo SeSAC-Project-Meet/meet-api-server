@@ -72,15 +72,16 @@ function chatSocketRouter(io) {
       socket.user,
       socket.id
     );
+    const senderSocketId = recordSocketId?.dataValues.socket_id;
     logger.info(
       // TODO : ???
-      `User connected & socket id recorded: ${JSON.stringify(recordSocketId)}`
+      `User connected & socket id recorded: ${senderSocketId}`
     );
 
     socket.on("initialMessage", async (data) => {
       const { chatroom_id } = data;
       const messages = await getMessageByChatroomId(chatroom_id);
-      socket.emit("initialMessage", messages);
+      socket.to(socket.id).emit("initialMessage", messages);
     });
 
     socket.on("message", (data) => handleSocketMessage(socket, data));

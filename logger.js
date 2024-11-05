@@ -14,10 +14,11 @@ const logger = winston.createLogger({
   format: combine(
     timestamp(), // 타임스탬프 추가
     winston.format.errors({ stack: true }), // 스택 트레이스 추가
-    customFormat // 커스텀 포맷 적용
+    // JSON 포맷 적용
+    winston.format.json({ space: 2 })
   ),
   transports: [
-    new winston.transports.Console(), // 콘솔에 로그 출력
+    new winston.transports.Console({ format: combine(customFormat) }), // 콘솔에 로그 출력
     new winston.transports.File({
       filename: "./logs/error.log",
       level: "error",

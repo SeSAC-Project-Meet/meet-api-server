@@ -11,7 +11,10 @@ const handleKakaoCallback = (req, res) => {
     }
     if (!user) {
       // 인증 실패 시
-      const { email } = info; // return value
+      const { email } = info.user; // return value
+      logger.info(
+        `Not registerd User logged in with kakao: ${JSON.stringify(email)}`
+      );
       return res
         .status(401)
         .send(
