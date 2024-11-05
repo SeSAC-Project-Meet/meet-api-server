@@ -81,7 +81,22 @@ function chatSocketRouter(io) {
     socket.on("initialMessage", async (data) => {
       const { chatroom_id } = data;
       const messages = await getMessageByChatroomId(chatroom_id);
-      socket.to(socket.id).emit("initialMessage", messages);
+      logger.info(`Initial Message: ${JSON.stringify(messages, null, 2)}`);
+      socket.emit("initialMessage", messages);
+    });
+
+    socket.on("join", (data) => {
+      const { chatroom_id } = data;
+      socket.join(chatroom_id);
+      logger.info(`Joined User to chatroom ${chatroom_id}`);
+      socket.to(chatroom_id).emit("userJoin", socket.user);
+    });
+
+    socket.on("leave", (data) => {
+      const { chatroom_id } = data;
+      socket.leave(chatroom_id);
+      logger.info(`Left User from chatroom ${chatroom_id}`);
+      socket.to(chatroom_id).emit("userLeave", socket.user);
     });
 
     socket.on("message", (data) => handleSocketMessage(socket, data));

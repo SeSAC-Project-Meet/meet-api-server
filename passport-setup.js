@@ -32,7 +32,9 @@ passport.use(
     logger.info(`[passport-setup] jwt_payload : ${jwt_payload}`);
     try {
       const user = await User.findByPk(jwt_payload.user_id); // payload에서 user_id로 사용자 찾기
-      logger.info(`[passport-setup] user_id in JWT payload: ${user}`);
+      logger.info(
+        `[passport-setup] user_id in JWT payload: ${user.dataValues.user_id}`
+      );
       if (user) {
         return done(null, user);
       } else {
