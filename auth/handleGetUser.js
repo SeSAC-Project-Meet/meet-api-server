@@ -1,5 +1,6 @@
+const logger = require("../logger");
 const handleGetUser = (req, res) => {
-  console.log("auth/user check, is user : " + !!req.user);
+  logger.info(`auth/user check, is user : ${!!req.user}`);
   if (req.user) {
     return res.status(200).json({ username: req.user.username });
   } else {

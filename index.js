@@ -40,7 +40,7 @@ const customlogger = (req, res, next) => {
   logger.info(logText);
 
   // res.send(logText); // 주석처리 해제 안하면 crash .. 확인용 코드라 그럼
-  // console.log(logText);
+  // logger.info(logText);
   next();
 };
 
@@ -61,7 +61,7 @@ app.use("/inquiry", inquiryRouter);
 app.use("/chat", chat);
 
 const server = app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  logger.info(`Server is running on http://localhost:${PORT}`);
 });
 
 const io = new Server(server, {

@@ -1,9 +1,9 @@
 const User = require("./define/User");
+const logger = require("../logger");
 
 const getUserbyEmail = async (email) => {
-  console.log(`getUserbyEmail: ${email}`);
+  logger.info(`getUserbyEmail: ${email}`);
   const user = await User.findOne({ where: { email: email } });
-  console.log("LOG");
   if (!user) {
     return null;
   }

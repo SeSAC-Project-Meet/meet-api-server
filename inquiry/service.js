@@ -16,10 +16,10 @@
 //   try {
 //     const inquiry = await Inquiry.findByPk(id);
 //     if (inquiry) {
-//       // console.log(inquiry);
+//       // logger.info(inquiry);
 //       return inquiry;
 //     } else {
-//       // console.log(`Inquiry with ID ${id} not found.`);
+//       // logger.info(`Inquiry with ID ${id} not found.`);
 //       return null;
 //     }
 //   } catch (error) {

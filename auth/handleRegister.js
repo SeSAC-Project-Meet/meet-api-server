@@ -1,9 +1,10 @@
 const registerUser = require("../models/user/registerUser");
 const bcrypt = require("bcrypt");
+const logger = require("../logger");
 const config = require("../config.json").development;
 
 const handleRegister = async (req, res) => {
-  console.log(req.body);
+  logger.info(req.body);
   const { name, email, phone_number, password } = req.body;
   // Check if the user already exists
   // If the user does not exist, create a new user
@@ -26,7 +27,7 @@ const handleRegister = async (req, res) => {
       phone_number: phone_number,
       password: hashedPassword,
     });
-    console.log(result.status);
+    logger.info(result.status);
     res.status(result.status).json({ message: result.message });
   } catch (err) {
     console.error(err);

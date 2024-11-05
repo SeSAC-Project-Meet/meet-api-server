@@ -1,12 +1,13 @@
 const getMessageByChatroomId = require("../../models/message/getMessagesByChatroomId");
+const logger = require("../../logger");
 
 const handleGetChatsInChatroom = async (req, res) => {
   const { chatroom_id } = req.query;
-  console.log("[handleGetChatsInChatroom] chatroom_id: ", chatroom_id);
+  logger.info(`[handleGetChatsInChatroom] chatroom_id: ${chatroom_id}`);
 
   getMessageByChatroomId(chatroom_id)
     .then((getChats) => {
-      console.log("[handleGetChatsInChatroom] getChats: ", getChats);
+      logger.info(`[handleGetChatsInChatroom] getChats: ${getChats}`);
       return res.status(200).json(getChats);
     })
     .catch((error) => {

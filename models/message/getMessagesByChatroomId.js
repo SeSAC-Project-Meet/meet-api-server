@@ -12,7 +12,10 @@ const getMessageByChatroomId = async (chatroomId) => {
     ],
     where: { chatroom_id: chatroomId },
   });
-  return messages;
+  if (messages && messages.length > 0) {
+    return messages.map((m) => m.dataValues);
+  }
+  return null;
 };
 
 module.exports = getMessageByChatroomId;

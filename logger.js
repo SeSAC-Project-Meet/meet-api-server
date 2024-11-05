@@ -1,12 +1,20 @@
-// logger.js
 const winston = require("winston");
+const { format } = require("winston");
+const { combine, timestamp, printf } = format;
+
+// 함수명 트래킹을 위한 커스텀 포맷
+const customFormat = printf(({ level, message, timestamp, stack }) => {
+  const functionName = stack ? stack.split("\n")[0].trim() : "N/A";
+  return `${timestamp} [${level}] [${functionName}]: ${message}`;
+});
 
 // 로거 설정
 const logger = winston.createLogger({
   level: "info", // 기본 로그 레벨
-  format: winston.format.combine(
-    winston.format.timestamp(), // 타임스탬프 추가
-    winston.format.prettyPrint() // JSON 형식으로 출력
+  format: combine(
+    timestamp(), // 타임스탬프 추가
+    winston.format.errors({ stack: true }), // 스택 트레이스 추가
+    customFormat // 커스텀 포맷 적용
   ),
   transports: [
     new winston.transports.Console(), // 콘솔에 로그 출력

@@ -1,11 +1,12 @@
 const Chatroom = require("../../models/define/Chatroom");
 const User_chatroom = require("../../models/define/User_chatroom");
+const logger = require("../../logger");
 
 const handleCreateChatroom = async (req, res) => {
   const { name } = req.body;
   // const { user } = req.user;
-  console.log("[handleCreateChatroom] name: ", name);
-  console.log("[handleCreateChatroom] user: ", req.user.dataValues.user_id);
+  logger.info(`[handleCreateChatroom] name: ${name}`);
+  logger.info(`[handleCreateChatroom] user: ${req.user.dataValues.user_id}`);
 
   const chatroom = await Chatroom.create({ name, status: "active" });
   const chatroom_id = chatroom.dataValues.chatroom_id;

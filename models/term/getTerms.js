@@ -9,7 +9,7 @@ const getTerms = async () => {
 };
 
 // getTerms().then((terms) => {
-//   console.log(terms.map((term) => term.dataValues));
+//   logger.info(terms.map((term) => term.dataValues));
 // });
 
 module.exports = getTerms;

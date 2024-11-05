@@ -1,5 +1,6 @@
 const config = require("../config.json").AWS;
 const { SNSClient, PublishCommand } = require("@aws-sdk/client-sns");
+const logger = require("../logger");
 
 const client = new SNSClient({
   region: "ap-northeast-1",
@@ -18,7 +19,7 @@ const sendSMS = async () => {
   try {
     const command = new PublishCommand(params);
     const data = await client.send(command);
-    console.log("Message sent successfully:", data);
+    logger.info(`Message sent successfully: ${data}`);
   } catch (err) {
     console.error("Error sending message:", err);
   }
