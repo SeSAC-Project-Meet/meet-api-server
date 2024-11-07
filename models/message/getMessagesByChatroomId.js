@@ -14,9 +14,9 @@ const getMessageByChatroomId = async (chatroomId) => {
     where: { chatroom_id: chatroomId },
   });
   if (messages && messages.length > 0) {
-    logger.info(
-      `[getMessageByChatroomId] Messages: ${JSON.stringify(messages, null, 2)}`
-    );
+    // logger.info(
+    // `[getMessageByChatroomId] Messages: ${JSON.stringify(messages, null, 2)}`
+    // );
     return messages.map((m) => m.dataValues);
   }
   return null;

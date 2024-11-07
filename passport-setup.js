@@ -29,7 +29,9 @@ const opts = {
 passport.use(
   "jwt",
   new JWTStrategy(opts, async (jwt_payload, done) => {
-    logger.info(`[passport-setup] jwt_payload : ${jwt_payload}`);
+    logger.info(
+      `[passport-setup] jwt_payload : ${JSON.stringify(jwt_payload)}`
+    );
     try {
       const user = await User.findByPk(jwt_payload.user_id); // payload에서 user_id로 사용자 찾기
       logger.info(

@@ -68,20 +68,24 @@ function chatSocketRouter(io) {
   });
 
   chatio.on("connection", async (socket) => {
-    const recordSocketId = await insertSocketIdWithUserId(
-      socket.user,
-      socket.id
-    );
-    const senderSocketId = recordSocketId?.dataValues.socket_id;
-    logger.info(
-      // TODO : ???
-      `User connected & socket id recorded: ${senderSocketId}`
-    );
+    // const recordSocketId = await insertSocketIdWithUserId(
+    //   socket.user,
+    //   socket.id
+    // );
+    // const senderSocketId = recordSocketId?.dataValues.socket_id;
+    // logger.info(
+    //   // TODO : ???
+    //   `User connected & socket id recorded: ${senderSocketId}`
+    // );
 
+    // socket.onAny((event, ...args) => {
+    //   logger.error(`[chatsocket] Event: ${event}, Args: ${args}`);
+    // });
     socket.on("initialMessage", async (data) => {
+      logger.info(`Initial Message: ${JSON.stringify(data, null, 2)}`);
       const { chatroom_id } = data;
       const messages = await getMessageByChatroomId(chatroom_id);
-      logger.info(`Initial Message: ${JSON.stringify(messages, null, 2)}`);
+      // logger.info(`Initial Message: ${JSON.stringify(messages, null, 2)}`);
       socket.emit("initialMessage", messages);
     });
 
