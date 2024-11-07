@@ -14,6 +14,7 @@ const { PORT } = require("./config.json").development;
 const authRoutes = require("./auth/index.js");
 const inquiryRouter = require("./inquiry");
 const { chat, chatSocketRouter } = require("./chat/index.js");
+const verifyEmailRouter = require("./auth/verifyEmail");
 
 const app = express();
 
@@ -57,6 +58,8 @@ require("./passport-setup");
 app.use("/auth", authRoutes);
 
 app.use("/inquiry", inquiryRouter);
+
+app.use("/api-test", verifyEmailRouter);
 
 app.use("/chat", chat);
 
