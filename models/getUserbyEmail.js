@@ -1,13 +1,18 @@
-const { User } = require("./User");
+const User = require("./define/User");
+const logger = require("../logger");
 
 const getUserbyEmail = async (email) => {
-  console.log(`getUserbyEmail: ${email}`);
+  logger.info(`getUserbyEmail: ${email}`);
   const user = await User.findOne({ where: { email: email } });
-  console.log("LOG");
   if (!user) {
     return null;
   }
-  return user.user_id;
+  const ret = {
+    user_id: user.user_id,
+    username: user.username,
+    email: user.email,
+  };
+  return ret;
 };
 
 module.exports = getUserbyEmail;

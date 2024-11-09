@@ -5,32 +5,45 @@ const ExtractJwt = require("passport-jwt").ExtractJwt;
 const KakaoStrategy = require("passport-oauth2").Strategy;
 const axios = require("axios");
 
-// passport-local의 LocalStrategy와 passport-jwt의 JWTStrategy를 각각 올바르게 가져옴
-const config = require("./config.json");
+const config = require("./config.json").development;
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 
-const { User } = require("./models/User"); // User 모델 경로
+const User = require("./models/define/User"); // User 모델 경로
 const getUserbyEmail = require("./models/getUserbyEmail");
+const logger = require("./logger");
 
 const opts = {
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: config.development.JWT_SECRET,
+  jwtFromRequest: ExtractJwt.fromExtractors([
+    (req) => {
+      let token = null;
+      if (req.cookies) {
+        token = req.cookies.MEET_ACCESS_TOKEN; // 쿠키에서 JWT를 가져옵니다.
+        logger.info(`[passport-setup] JWT from cookie : ${token}`);
+      }
+      return token;
+    },
+  ]),
+  secretOrKey: config.JWT_SECRET, // 비밀 키 설정
 };
 
 passport.use(
-  // TODO : JWT 유효성 검증을 안하는데?
-
   "jwt",
   new JWTStrategy(opts, async (jwt_payload, done) => {
+    logger.info(
+      `[passport-setup] jwt_payload : ${JSON.stringify(jwt_payload)}`
+    );
     try {
       const user = await User.findByPk(jwt_payload.user_id); // payload에서 user_id로 사용자 찾기
+      logger.info(
+        `[passport-setup] user_id in JWT payload: ${user.dataValues.user_id}`
+      );
       if (user) {
         return done(null, user);
       } else {
         return done(null, false);
       }
     } catch (error) {
+      logger.info(`[passport-setup] JWT Error : ${error}`);
       return done(error, false);
     }
   })
@@ -39,11 +52,11 @@ passport.use(
 passport.use(
   "local",
   new LocalStrategy(
-    { usernameField: "phone_number", passwordField: "password" },
-    async (phone_number, password, done) => {
-      const user = await User.findOne({ where: { phone_number } });
+    { usernameField: "loginID", passwordField: "password" },
+    async (loginID, password, done) => {
+      logger.info(`🚀 ~ loginId: ${loginID}, password: ${password}`);
+      const user = await User.findOne({ where: { phone_number: loginID } });
       if (user && (await bcrypt.compare(password, user.password))) {
-        // console.log("🚀 ~ user:", user);
         return done(null, user);
       }
       return done(null, false);
@@ -57,15 +70,14 @@ passport.use(
     {
       authorizationURL: "https://kauth.kakao.com/oauth/authorize",
       tokenURL: "https://kauth.kakao.com/oauth/token",
-      clientID: config.development.KAKAO_REST_API_KEY, // 카카오 앱 키
+      clientID: config.KAKAO_REST_API_KEY, // 카카오 앱 키
       callbackURL: "/auth/kakao/callback", // 설정한 Redirect URI
-      clientSecret: config.development.KAKAO_CLIENT_SECRET, // 카카오 앱 시크릿
+      clientSecret: config.KAKAO_CLIENT_SECRET, // 카카오 앱 시크릿
       scope: ["profile_nickname", "profile_image", "account_email", "openid"],
     },
-    // verify callback
     async (accessToken, refreshToken, params, profile, done) => {
-      console.log("🚀 ~ CALLED");
-      console.log(params);
+      logger.info(`🚀 ~ CALLED`);
+      logger.info(`[passport] ${JSON.stringify(params)}`);
       try {
         const kakaoProfileRes = await axios.get(
           "https://kapi.kakao.com/v2/user/me",
@@ -77,18 +89,10 @@ passport.use(
           }
         );
 
-        // console.log(profile); // returns nothing
-        // console.log("Access Token:", accessToken);
-        // console.log("Refresh Token:", refreshToken);
-        // console.log("Profile:", profile);
-
         const kakaoUserProfile = kakaoProfileRes.data;
-        console.log(
-          "[passport-setup : kakao] KakaoUserProfile : ",
-          kakaoUserProfile
+        logger.info(
+          `[passport-setup : kakao] KakaoUserProfile : ${JSON.stringify(kakaoUserProfile)}`
         );
-        // 여기서 userProfile을 기반으로 DB에 사용자 정보 저장/조회 처리
-        // 제공받은 정보를 기반으로 비교하는 로직이 필봄
 
         const kakaoUserProfileParsed = {
           kakao_id_token: params.id_token,
@@ -98,23 +102,25 @@ passport.use(
           email: kakaoUserProfile.kakao_account.email,
         };
 
-        const user_id = await getUserbyEmail(kakaoUserProfileParsed.email);
-        if (!user_id) {
-          done(null, false, {
-            message: "User not found}",
+        const user = await getUserbyEmail(kakaoUserProfileParsed.email);
+        if (!user) {
+          return done(null, false, {
+            message: "User not found",
+            user: kakaoUserProfileParsed,
           });
-          // throw new Error("User not found");
+        } else {
+          const userInfo = { ...kakaoUserProfileParsed, ...user };
+          logger.info(
+            `[passport-setup : kakao] Final User Info : ${JSON.stringify(userInfo)}`
+          );
+          return done(null, userInfo);
         }
-        const userInfo = { ...kakaoUserProfileParsed, user_id: user_id };
-        console.log("[passport-setup : kakao] Final User Info : ", userInfo);
-        done(null, userInfo); // user_id를 parse해서 돌려보냄
       } catch (error) {
-        console.log("[passport-setup : kakao] Error : ", error);
-
-        done(error, null);
+        logger.info(`[passport-setup : kakao] Error : ${error}`);
+        return done(error, null);
       }
     }
   )
 );
 
-console.log("passport-setup.js loaded");
+logger.info(`passport-setup.js loaded`);

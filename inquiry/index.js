@@ -5,6 +5,7 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const Inquiry = require("../models/Inquiry");
+const logger = require("../logger");
 
 try {
   fs.readdirSync("uploads");
@@ -28,8 +29,8 @@ const upload = multer({
 // POST /inquiry/image
 // router.post("/image", isLoggedIn, upload.single("image1"), afterUploadImage);
 router.post("/image", upload.single("image1"), (req, res, next) => {
-  console.log("요청.파일", req.file);
-  console.log("요청.바디", req.body);
+  logger.info(`요청.파일 : ${req.file}`);
+  logger.info(`요청.바디 : ${req.body}`);
   const photoUrl = req.file ? `/uploads/${req.file.filename}` : null;
   res.json({ url: photoUrl });
   // TODO : 정적 라우팅 설정 ㄱ
@@ -46,7 +47,7 @@ router
     try {
       const inquiries = await Inquiry.findAll();
       res.json(inquiries);
-      // console.log(inquiries);
+      // logger.info(inquiries);
     } catch (error) {
       console.error(error.message);
       next(error);
@@ -64,7 +65,7 @@ router
         photo_url_1: req.body.url, // TODO : FE에서 넣어주기.
       });
       res.status(201).json(newInquiry);
-      // console.log(newInquiry);
+      // logger.info(newInquiry);
     } catch (error) {
       console.error(error.message);
       next(error);
@@ -78,7 +79,7 @@ router
     try {
       const inquiry = await Inquiry.findByPk(req.params.inquiryId);
       res.json(inquiry);
-      // console.log(inquiry);
+      // logger.info(inquiry);
     } catch (error) {
       console.error(error.message);
       next(error);
