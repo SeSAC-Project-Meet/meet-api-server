@@ -3,6 +3,8 @@
 config.json
 /uploads
 
+*.pem
+
 # WebStorm
 .idea
 

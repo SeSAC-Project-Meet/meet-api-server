@@ -11,9 +11,10 @@ const handleLogin = async (req, res) => {
     logger.info(`Login success, Token : ${createdToken}`);
     const { user_id, username } = req.user;
     const cookieOptions = {
-      maxAge: 1000 * 60 * 5, // 5 m
+      maxAge: 1000 * 60 * 60, // ms * s * m * h
       httpOnly: true,
-      sameSite: "strict",
+      sameSite: "none",
+      secure: true,
     };
     return res
       .status(200)
