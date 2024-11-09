@@ -1,35 +1,38 @@
 const { DataTypes, Model } = require("sequelize");
 const sequelize = require("../connectToDB");
 
-class Message_user extends Model {}
+class User_profile extends Model {}
 
-Message_user.init(
+User_profile.init(
   {
-    message_user_id: {
+    user_profile_id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
-    message_id: {
+    user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    checked_user_id: {
-      type: DataTypes.INTEGER,
+    nickname: {
+      type: DataTypes.STRING(30),
       allowNull: false,
     },
-    checked_at: {
-      type: DataTypes.DATE(6),
-      defaultValue: sequelize.fn("CURRENT_TIMESTAMP", 6),
+    introduction: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+    },
+    mbti_id: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
   },
   {
     sequelize,
-    modelName: "Message_user",
-    tableName: "message_user",
+    modelName: "User_profile",
+    tableName: "user_profile",
     timestamps: false,
   }
 );
 
-module.exports = Message_user;
+module.exports = User_profile;

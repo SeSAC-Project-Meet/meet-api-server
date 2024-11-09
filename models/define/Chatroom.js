@@ -1,21 +1,9 @@
-/*
-create table project_meet.chatroom
-(
-    chatroom_id int auto_increment
-        primary key,
-    name        int                                       not null,
-    status      varchar(100)                              not null,
-    created_at  timestamp(6) default CURRENT_TIMESTAMP(6) not null,
-    updated_at  timestamp(6) default CURRENT_TIMESTAMP(6) not null on update CURRENT_TIMESTAMP(6)
-);
-
-*/
-
-const { DataTypes } = require("sequelize");
+const { DataTypes, Model } = require("sequelize");
 const sequelize = require("../connectToDB");
 
-const Chatroom = sequelize.define(
-  "chatroom",
+class Chatroom extends Model {}
+
+Chatroom.init(
   {
     chatroom_id: {
       type: DataTypes.INTEGER,
@@ -32,6 +20,8 @@ const Chatroom = sequelize.define(
     },
   },
   {
+    sequelize,
+    modelName: "Chatroom",
     tableName: "chatroom",
     timestamps: false,
   }

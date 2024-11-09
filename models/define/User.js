@@ -1,8 +1,9 @@
 const sequelize = require("../connectToDB");
-const { DataTypes, Sequelize } = require("sequelize");
+const { DataTypes, Model } = require("sequelize");
 
-const User = sequelize.define(
-  "user",
+class User extends Model {}
+
+User.init(
   {
     user_id: {
       type: DataTypes.INTEGER,
@@ -29,17 +30,19 @@ const User = sequelize.define(
     },
     created_at: {
       type: DataTypes.DATE(6),
-      defaultValue: Sequelize.fn("CURRENT_TIMESTAMP", 6),
+      defaultValue: DataTypes.NOW,
       allowNull: false,
     },
     updated_at: {
       type: DataTypes.DATE(6),
-      defaultValue: Sequelize.fn("CURRENT_TIMESTAMP", 6),
+      defaultValue: DataTypes.NOW,
       allowNull: false,
-      onUpdate: Sequelize.fn("CURRENT_TIMESTAMP", 6),
+      onUpdate: DataTypes.NOW,
     },
   },
   {
+    sequelize,
+    modelName: "User",
     tableName: "user",
     timestamps: false, // If you want to manage created_at and updated_at manually
   }

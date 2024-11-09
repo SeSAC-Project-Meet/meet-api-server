@@ -1,11 +1,11 @@
 const { DataTypes, Model } = require("sequelize");
 const sequelize = require("../connectToDB");
 
-class Message extends Model {}
+class User_tag extends Model {}
 
-Message.init(
+User_tag.init(
   {
-    message_id: {
+    user_tag_id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
@@ -14,21 +14,9 @@ Message.init(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    chatroom_id: {
+    tag_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-    },
-    type: {
-      type: DataTypes.STRING(30),
-      allowNull: false,
-    },
-    text: {
-      type: DataTypes.STRING(4096),
-      allowNull: true,
-    },
-    image_url: {
-      type: DataTypes.STRING(1024),
-      allowNull: true,
     },
     created_at: {
       type: DataTypes.DATE(6),
@@ -44,10 +32,10 @@ Message.init(
   },
   {
     sequelize,
-    modelName: "Message",
-    tableName: "message",
+    modelName: "User_tag",
+    tableName: "user_tag",
     timestamps: false,
   }
 );
 
-module.exports = Message;
+module.exports = User_tag;

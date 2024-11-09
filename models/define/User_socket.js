@@ -1,22 +1,9 @@
-/*
-create table project_meet.user_socket
-(
-    user_socket_id int auto_increment
-        primary key,
-    socket_id      varchar(50) not null,
-    user_id        int         not null,
-    status         tinyint(1)  not null,
-    constraint user_socket_user_user_id_fk
-        foreign key (user_id) references project_meet.user (user_id)
-);
-
-*/
-
-const { DataTypes } = require("sequelize");
+const { DataTypes, Model } = require("sequelize");
 const sequelize = require("../connectToDB");
 
-const User_socket = sequelize.define(
-  "user_socket",
+class User_socket extends Model {}
+
+User_socket.init(
   {
     user_socket_id: {
       type: DataTypes.INTEGER,
@@ -37,6 +24,8 @@ const User_socket = sequelize.define(
     },
   },
   {
+    sequelize,
+    modelName: "User_socket",
     tableName: "user_socket",
     timestamps: false,
   }

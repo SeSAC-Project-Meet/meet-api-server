@@ -1,23 +1,9 @@
+const { DataTypes, Sequelize, Model } = require("sequelize");
 const sequelize = require("../connectToDB");
-const { DataTypes, Sequelize } = require("sequelize");
 
-/*
-create table project_meet.term
-(
-    term_id     int auto_increment
-        primary key,
-    title       varchar(1024)                             not null,
-    content     varchar(4096)                             not null,
-    is_required tinyint(1)                                not null,
-    created_at  timestamp(6) default CURRENT_TIMESTAMP(6) not null,
-    updated_at  timestamp(6) default CURRENT_TIMESTAMP(6) not null on update CURRENT_TIMESTAMP(6)
-);
+class Term extends Model {}
 
-
-*/
-
-const Term = sequelize.define(
-  "term",
+Term.init(
   {
     term_id: {
       type: DataTypes.INTEGER,
@@ -49,6 +35,8 @@ const Term = sequelize.define(
     },
   },
   {
+    sequelize,
+    modelName: "Term",
     tableName: "term",
     timestamps: false,
   }

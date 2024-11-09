@@ -9,6 +9,7 @@ const handleKakaoCallback = require("./handleKakaoCallback");
 const handleCheckUnique = require("./handleCheckUnique");
 const handleGetTerms = require("./handleGetTerms");
 const handleAddTerms = require("./handleAddTerms");
+const handleSpecificRegister = require("./handleSpecificRegister");
 
 auth.get("/terms", handleGetTerms);
 // TODO: 다른 서버로 분리하던, ip제한이던 해야합니다.
@@ -23,6 +24,7 @@ auth.get(
 // 24/10/26 01:35 개발 끝
 auth.post("/register", handleRegister);
 auth.post("/check-unique", handleCheckUnique);
+auth.post("/register/specific", handleSpecificRegister);
 
 // 24/10/26 01:35 개발 끝
 auth.post(
