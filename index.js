@@ -1,4 +1,6 @@
 const express = require("express");
+const https = require("https");
+const fs = require("fs");
 
 const cors = require("cors");
 const logger = require("./logger");
@@ -20,8 +22,14 @@ const app = express();
 app.use(cookieParser());
 
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin: ["http://localhost:5173", "http://192.168.35.254:5173"],
   credentials: true,
+};
+
+// SSL 인증서 로드
+const sslOptions = {
+  key: fs.readFileSync("localhost-key.pem"), // 개인 키 파일
+  cert: fs.readFileSync("localhost-cert.pem"), // 인증서 파일
 };
 
 app.use(cors(corsOptions));
@@ -40,7 +48,7 @@ const customlogger = (req, res, next) => {
   logger.info(logText);
 
   // res.send(logText); // 주석처리 해제 안하면 crash .. 확인용 코드라 그럼
-  // console.log(logText);
+  // logger.info(logText);
   next();
 };
 
@@ -60,8 +68,9 @@ app.use("/inquiry", inquiryRouter);
 
 app.use("/chat", chat);
 
-const server = app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+const server = https.createServer(sslOptions, app);
+server.listen(PORT, "0.0.0.0", () => {
+  logger.info(`Server is running on https://localhost:${PORT}`);
 });
 
 const io = new Server(server, {

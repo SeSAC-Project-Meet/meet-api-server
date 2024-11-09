@@ -1,4 +1,5 @@
 const Message = require("../define/Message");
+const logger = require("../../logger");
 
 const getMessageByChatroomId = async (chatroomId) => {
   const messages = await Message.findAll({
@@ -12,7 +13,13 @@ const getMessageByChatroomId = async (chatroomId) => {
     ],
     where: { chatroom_id: chatroomId },
   });
-  return messages;
+  if (messages && messages.length > 0) {
+    // logger.info(
+    // `[getMessageByChatroomId] Messages: ${JSON.stringify(messages, null, 2)}`
+    // );
+    return messages.map((m) => m.dataValues);
+  }
+  return null;
 };
 
 module.exports = getMessageByChatroomId;

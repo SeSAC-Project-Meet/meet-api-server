@@ -1,4 +1,5 @@
 const User = require("../define/User");
+const logger = require("../../logger");
 
 /**
  * Registers a new user in the database.
@@ -20,9 +21,9 @@ async function registerUser(userData) {
     });
 
     if (existingUser) {
-      console.log(
+      logger.info(
         "User already exists with this phone_number:",
-        userData.phone_number
+        userData.phone_number,
       );
       return {
         status: 409,
@@ -32,7 +33,7 @@ async function registerUser(userData) {
 
     // 유저가 존재하지 않으면 새 유저 생성
     const user = await User.create(userData);
-    console.log("User registered:", user.toJSON());
+    logger.info(`User registered: ${user.toJSON()}`);
     return { status: 201, message: "User registered successfully" };
   } catch (error) {
     console.error("Error registering user:", error);

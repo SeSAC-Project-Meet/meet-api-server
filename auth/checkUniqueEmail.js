@@ -1,4 +1,5 @@
 const User = require("../models/define/User");
+const logger = require("../logger");
 
 const checkUniqueEmail = async (email) => {
   try {
@@ -8,21 +9,21 @@ const checkUniqueEmail = async (email) => {
     });
 
     if (existingUser) {
-      console.log(
+      logger.info(
         "[checkUniqueEmail] User already exists with this Email:",
-        email
+        email,
       );
       return {
         status: 409,
         message: `User already exists with this email : ${email}`,
       };
     } else {
-      console.log("[checkUniqueEmail] Unique Email, good to go : ", email);
+      logger.info(`[checkUniqueEmail] Unique Email, good to go : ${email}`);
       return { status: 200, message: "Unique Email, good to go" };
     }
   } catch (error) {
-    console.error("[checkUniqueEmail] Error checking email", error);
-    throw new Error("[checkUniqueEmail] Error checking email", error);
+    console.error(`[checkUniqueEmail] Error checking email: ${error}`);
+    throw new Error("[checkUniqueEmail] Error checking email");
   }
 };
 
