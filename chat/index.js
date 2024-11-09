@@ -17,6 +17,9 @@ const cookie = require("cookie");
 const logger = require("../logger");
 const getMessageByChatroomId = require("../models/message/getMessagesByChatroomId");
 
+const handleCreateMeetroom = require("./service/handleCreateMeetroom");
+const handleGetMeetroom = require("./service/handleGetMeetroom");
+
 const passportOptions = {
   session: false,
 };
@@ -35,11 +38,24 @@ chat.get(
   handleGetChatroom
 );
 
+chat.post(
+  "/meetroom",
+  passport.authenticate("jwt", passportOptions),
+  handleCreateMeetroom
+);
+
+chat.get(
+  "/meetroom",
+  passport.authenticate("jwt", passportOptions),
+  handleGetMeetroom
+);
+
 function chatSocketRouter(io) {
   logger.info(`./chat loaded`);
   const chatio = io.of("/chat");
   const videocall = io.of("/videocall");
   const groupcall = io.of("/groupcall");
+  let socketList = {};
 
   groupcall.on("connection", (socket) => {
     socket.on("join-room", (roomId, userId) => {
@@ -156,6 +172,35 @@ function chatSocketRouter(io) {
           logger.info(`Error deleting socket id record: ${err}`);
         });
     });
+
+
+    /* Video-calls */
+    /**
+     * Join Room
+     */
+    socket.on('BE-join-room', ({meetroomId}) => {
+      // Socket Join RoomName
+      console.log('BE-join-room', meetroomId, socket.user);
+      socket.join(meetroomId);
+      socketList[socket.id] = { user: socket.user, video: true, audio: true };
+      // Set User List
+      io.sockets.in(meetroomId).allSockets().then(clients => {
+        try {
+          const users = [];
+          clients.forEach((client) => {
+            // Add User List
+            users.push({ userId: client, info: socketList[client] });
+            console.log("sdfdsfds");
+          });
+          socket.broadcast.to(meetroomId).emit('FE-user-join', users);
+          console.log(users);
+        } catch (e) {
+          console.log("error occur");
+        }
+      });
+    });
+
+
   });
 }
 
