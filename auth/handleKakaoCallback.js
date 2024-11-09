@@ -32,7 +32,7 @@ const handleKakaoCallback = (req, res) => {
 
     const createdToken = createJWT(user.user_id);
     const { user_id, username } = user; // return value
-
+    logger.info("로그인 성공, 토큰 발급 후 쿠키로 전달합니다.");
     return res
       .status(200)
       .cookie("MEET_ACCESS_TOKEN", createdToken, cookieOptions)

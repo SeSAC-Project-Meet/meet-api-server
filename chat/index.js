@@ -16,6 +16,7 @@ const insertSocketIdWithUserId = require("../models/user/insertSocketdWithUserId
 const cookie = require("cookie");
 const logger = require("../logger");
 const getMessageByChatroomId = require("../models/message/getMessagesByChatroomId");
+const handleUserLeaveChatroom = require("./service/handleUserLeaveChatroom");
 
 const passportOptions = {
   session: false,
@@ -133,12 +134,7 @@ function chatSocketRouter(io) {
       socket.to(chatroom_id).emit("userJoin", socket.user);
     });
 
-    socket.on("leave", (data) => {
-      const { chatroom_id } = data;
-      socket.leave(chatroom_id);
-      logger.info(`Left User from chatroom ${chatroom_id}`);
-      socket.to(chatroom_id).emit("userLeave", socket.user);
-    });
+    socket.on("leave", (data) => handleUserLeaveChatroom(socket, data));
 
     socket.on("message", (data) => handleSocketMessage(socket, data));
 
