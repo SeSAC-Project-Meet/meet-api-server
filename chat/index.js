@@ -38,6 +38,43 @@ chat.get(
 function chatSocketRouter(io) {
   logger.info(`./chat loaded`);
   const chatio = io.of("/chat");
+  const videocall = io.of("/videocall");
+  const groupcall = io.of("/groupcall");
+
+  groupcall.on("connection", (socket) => {
+    socket.on("join-room", (roomId, userId) => {
+      socket.join(roomId);
+      socket.broadcast.to(roomId).emit("user-connected", userId);
+
+      socket.on("disconnect", () => {
+        socket.broadcast.to(roomId).emit("user-disconnected", userId);
+      });
+    });
+  });
+
+  videocall.on("connection", (socket) => {
+    logger.info(`User connected to /videocall namespace ${socket.id}`);
+
+    socket.on("offer", (data) => {
+      socket.broadcast.emit("offer", data);
+    });
+
+    socket.on("answer", (data) => {
+      socket.broadcast.emit("answer", data);
+    });
+
+    socket.on("candidate", (data) => {
+      socket.broadcast.emit("candidate", data);
+    });
+
+    socket.on("reconnect", () => {
+      logger.info(`User reconnected to /videocall namespace`);
+    });
+
+    socket.on("disconnect", (reason) => {
+      logger.info(`User disconnected: ${reason}`);
+    });
+  });
 
   chatio.use((socket, next) => {
     const rawToken = socket.request.headers.cookie;
@@ -68,20 +105,39 @@ function chatSocketRouter(io) {
   });
 
   chatio.on("connection", async (socket) => {
-    const recordSocketId = await insertSocketIdWithUserId(
-      socket.user,
-      socket.id
-    );
-    const senderSocketId = recordSocketId?.dataValues.socket_id;
-    logger.info(
-      // TODO : ???
-      `User connected & socket id recorded: ${senderSocketId}`
-    );
+    // const recordSocketId = await insertSocketIdWithUserId(
+    //   socket.user,
+    //   socket.id
+    // );
+    // const senderSocketId = recordSocketId?.dataValues.socket_id;
+    // logger.info(
+    //   // TODO : ???
+    //   `User connected & socket id recorded: ${senderSocketId}`
+    // );
 
+    // socket.onAny((event, ...args) => {
+    //   logger.error(`[chatsocket] Event: ${event}, Args: ${args}`);
+    // });
     socket.on("initialMessage", async (data) => {
+      logger.info(`Initial Message: ${JSON.stringify(data, null, 2)}`);
       const { chatroom_id } = data;
       const messages = await getMessageByChatroomId(chatroom_id);
-      socket.to(socket.id).emit("initialMessage", messages);
+      // logger.info(`Initial Message: ${JSON.stringify(messages, null, 2)}`);
+      socket.emit("initialMessage", messages);
+    });
+
+    socket.on("join", (data) => {
+      const { chatroom_id } = data;
+      socket.join(chatroom_id);
+      logger.info(`Joined User to chatroom ${chatroom_id}`);
+      socket.to(chatroom_id).emit("userJoin", socket.user);
+    });
+
+    socket.on("leave", (data) => {
+      const { chatroom_id } = data;
+      socket.leave(chatroom_id);
+      logger.info(`Left User from chatroom ${chatroom_id}`);
+      socket.to(chatroom_id).emit("userLeave", socket.user);
     });
 
     socket.on("message", (data) => handleSocketMessage(socket, data));

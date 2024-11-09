@@ -24,9 +24,10 @@ const handleKakaoCallback = (req, res) => {
 
     logger.info(`Kakao login success: ${user}`);
     const cookieOptions = {
-      maxAge: 1000 * 60 * 5, // 1 day
+      maxAge: 1000 * 60 * 60, // ms * s * m * h
       httpOnly: true,
-      sameSite: "strict",
+      sameSite: "none",
+      secure: true,
     };
 
     const createdToken = createJWT(user.user_id);

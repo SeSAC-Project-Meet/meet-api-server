@@ -17,8 +17,8 @@ const handleCreateChatroom = async (req, res) => {
     user_status: "active",
   });
   res.status(201).json({
-    uc_id: registerUserToChatroom.user_chatroom_id,
-    c_id: chatroom.chatroom_id,
+    user_chatroom_id: registerUserToChatroom.user_chatroom_id,
+    chatroom_id: chatroom.chatroom_id,
   });
 };
 
