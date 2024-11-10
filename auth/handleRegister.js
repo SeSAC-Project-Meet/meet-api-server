@@ -10,16 +10,28 @@ const handleRegister = async (req, res) => {
   // If the user does not exist, create a new user
   // Return the user data
   try {
-    let trimmedPassword = password.trim();
-    if (trimmedPassword.length < 8) {
-      // 비밀번호 조건확인 로직
-      res
-        .status(400)
-        .json({ message: "Password must be at least 8 characters long" });
-      return;
+    const nameRegex = /^[a-zA-Z가-힣]+$/;
+    if (!nameRegex.test(name)) {
+      return res.status(400).json({ message: "Invalid Format Received" });
     }
+
+    const phoneRegex =
+      /^(010|011|016|017|018|019|02|031|032|033|034|041|042|043|044|051|052|053|054|055|061|062|063|064|070)-\d{3,4}-\d{4}$/;
+    if (!phoneRegex.test(phone_number)) {
+      return res.status(400).json({ message: "Invalid Format Received" });
+    }
+
+    const trimmedPassword = password.trim();
+    const regex =
+      /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+[\]{};':"\\|,.<>/?-]).{8,}$/;
+
+    if (!regex.test(trimmedPassword)) {
+      // 비밀번호 조건확인 로직
+      return res.status(400).json({ message: "Invalid Format Received" });
+    }
+
     const bcryptSalt = await bcrypt.genSalt(config.SALT_ROUNDS);
-    const hashedPassword = await bcrypt.hash(password, bcryptSalt);
+    const hashedPassword = await bcrypt.hash(trimmedPassword, bcryptSalt);
     const result = await registerUser({
       // 젠장할 await을 잘 씁시다 ^&^
       username: name, // username이 name으로 변경되었습니다.
