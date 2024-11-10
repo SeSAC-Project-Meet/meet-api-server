@@ -1,14 +1,23 @@
 const jwt = require("jsonwebtoken");
+const User_refresh_token = require("../models/define/User_refresh_token");
 const config = require("../config.json").development;
 
-function createRefreshToken(user_id) {
+async function createRefreshToken(user_id, username) {
   const payload = {
-    user_id: user_id,
+    user_id,
+    username,
   };
   const options = {
-    expiresIn: "10m",
+    expiresIn: "7d",
   };
-  return jwt.sign(payload, config.JWT_SECRET, options);
+  const result = jwt.sign(payload, config.JWT_SECRET, options);
+
+  await User_refresh_token.create({
+    user_id,
+    token: result,
+  });
+
+  return result;
 }
 
 module.exports = createRefreshToken;

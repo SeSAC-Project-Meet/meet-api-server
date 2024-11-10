@@ -11,8 +11,6 @@ const handleSocketMessage = require("./service/handleSocketMessage");
 const User_socket = require("../models/define/User_socket");
 const handleGetChatsInChatroom = require("./service/handleGetChatsInChatroom");
 
-const insertSocketIdWithUserId = require("../models/user/insertSocketdWithUserId");
-
 const cookie = require("cookie");
 const logger = require("../logger");
 const getMessageByChatroomId = require("../models/message/getMessagesByChatroomId");

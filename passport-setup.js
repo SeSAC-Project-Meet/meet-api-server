@@ -11,14 +11,15 @@ const bcrypt = require("bcrypt");
 const User = require("./models/define/User"); // User 모델 경로
 const getUserbyEmail = require("./models/getUserbyEmail");
 const logger = require("./logger");
+const User_refresh_token = require("./models/define/User_refresh_token");
 
-const opts = {
+const optsCookie = {
   jwtFromRequest: ExtractJwt.fromExtractors([
     (req) => {
       let token = null;
       if (req.cookies) {
-        token = req.cookies.MEET_ACCESS_TOKEN; // 쿠키에서 JWT를 가져옵니다.
-        logger.info(`[passport-setup] JWT from cookie : ${token}`);
+        token = req.cookies.MEET_REFRESH_TOKEN; // 쿠키에서 JWT를 가져옵니다.
+        logger.info(`[passport-setup] 쿠키에서 JWT 파싱완료 : ${!!token}`);
       }
       return token;
     },
@@ -26,16 +27,58 @@ const opts = {
   secretOrKey: config.JWT_SECRET, // 비밀 키 설정
 };
 
+const optsHeader = {
+  jwtFromRequest: ExtractJwt.fromExtractors([
+    (req) => {
+      const token =
+        ExtractJwt.fromAuthHeaderAsBearerToken()(req) ||
+        ExtractJwt.fromHeader("x-access-token")(req);
+      logger.info(`[passport-setup] Header에서 JWT 파싱완료 : ${!!token}`);
+      return token;
+    },
+  ]),
+  secretOrKey: config.JWT_SECRET, // 비밀 키 설정
+};
+
+passport.use(
+  "jwtRefresh",
+  new JWTStrategy(optsCookie, async (jwt_payload, done) => {
+    logger.info(
+      `[passport-setup] RefreshToken 검증 시도 : ${JSON.stringify(jwt_payload, null, 2)}`
+    );
+    try {
+      const user =
+        (await User_refresh_token.count({
+          where: { user_id: jwt_payload.user_id, user_valid: true },
+        })) > 0;
+      logger.info(
+        `[passport-setup] RefreshToken 검증 결과 : ${JSON.stringify(user, null, 2)}`
+      );
+      if (user) {
+        return done(null, {
+          user_id: jwt_payload.user_id,
+          username: jwt_payload.username,
+        });
+      } else {
+        return done(null, false);
+      }
+    } catch (error) {
+      logger.info(`[passport-setup] RefreshToken 검증 중 오류 발생 : ${error}`);
+      return done(error, false);
+    }
+  })
+);
+
 passport.use(
   "jwt",
-  new JWTStrategy(opts, async (jwt_payload, done) => {
+  new JWTStrategy(optsHeader, async (jwt_payload, done) => {
     logger.info(
-      `[passport-setup] jwt_payload : ${JSON.stringify(jwt_payload)}`
+      `[passport-setup] jwt_payload : ${JSON.stringify(jwt_payload, null, 2)}`
     );
     try {
       const user = await User.findByPk(jwt_payload.user_id); // payload에서 user_id로 사용자 찾기
       logger.info(
-        `[passport-setup] user_id in JWT payload: ${user.dataValues.user_id}`
+        `[passport-setup] JWT에 따른 사용자 ID : ${user.dataValues.user_id}`
       );
       if (user) {
         return done(null, user);
@@ -43,7 +86,7 @@ passport.use(
         return done(null, false);
       }
     } catch (error) {
-      logger.info(`[passport-setup] JWT Error : ${error}`);
+      logger.info(`[passport-setup] AccessToken Error : ${error}`);
       return done(error, false);
     }
   })
@@ -54,11 +97,15 @@ passport.use(
   new LocalStrategy(
     { usernameField: "loginID", passwordField: "password" },
     async (loginID, password, done) => {
-      logger.info(`🚀 ~ loginId: ${loginID}, password: ${password}`);
+      logger.info(
+        `[passport-setup] 로그인 요청 id: ${loginID}, password: ${password}`
+      );
       const user = await User.findOne({ where: { phone_number: loginID } });
       if (user && (await bcrypt.compare(password, user.password))) {
+        logger.info(`[passport-setup] 로그인 성공`);
         return done(null, user);
       }
+      logger.info(`[passport-setup] 로그인 실패`);
       return done(null, false);
     }
   )
@@ -76,8 +123,9 @@ passport.use(
       scope: ["profile_nickname", "profile_image", "account_email", "openid"],
     },
     async (accessToken, refreshToken, params, profile, done) => {
-      logger.info(`🚀 ~ CALLED`);
-      logger.info(`[passport] ${JSON.stringify(params)}`);
+      logger.info(
+        `[passport-setup] 카카오 로그인 verify 함수:  ${JSON.stringify(params, null, 2)}`
+      );
       try {
         const kakaoProfileRes = await axios.get(
           "https://kapi.kakao.com/v2/user/me",
@@ -91,7 +139,7 @@ passport.use(
 
         const kakaoUserProfile = kakaoProfileRes.data;
         logger.info(
-          `[passport-setup : kakao] KakaoUserProfile : ${JSON.stringify(kakaoUserProfile)}`
+          `[passport-setup] 카카오 me로부터 가지고 온 정보 : ${JSON.stringify(kakaoUserProfile, null, 2)}`
         );
 
         const kakaoUserProfileParsed = {
@@ -111,7 +159,7 @@ passport.use(
         } else {
           const userInfo = { ...kakaoUserProfileParsed, ...user };
           logger.info(
-            `[passport-setup : kakao] Final User Info : ${JSON.stringify(userInfo)}`
+            `[passport-setup] 카카오계정 이메일에 일치하는 사용자가 존재합니다, 다음 정보를 전달합니다 :\n${JSON.stringify(userInfo, null, 2)}`
           );
           return done(null, userInfo);
         }
@@ -123,4 +171,4 @@ passport.use(
   )
 );
 
-logger.info(`passport-setup.js loaded`);
+logger.info(`[INFO] passport-setup.js loaded`);

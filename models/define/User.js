@@ -1,7 +1,26 @@
 const sequelize = require("../connectToDB");
 const { DataTypes, Model } = require("sequelize");
 
-class User extends Model {}
+class User extends Model {
+  static associate(models) {
+    User.hasMany(models.User_profile, {
+      foreignKey: "user_id",
+      sourceKey: "user_id",
+    });
+    User.hasMany(models.User_socket, {
+      foreignKey: "user_id",
+      sourceKey: "user_id",
+    });
+    User.hasMany(models.User_tag, {
+      foreignKey: "user_id",
+      sourceKey: "user_id",
+    });
+    User.hasMany(models.Chatroom, {
+      foreignKey: "user_id",
+      sourceKey: "user_id",
+    });
+  }
+}
 
 User.init(
   {
