@@ -1,14 +1,15 @@
 const jwt = require("jsonwebtoken");
 const config = require("../config.json").development;
 
-function createJWT(user_id) {
+function createAccessToken(user_id, username) {
   const payload = {
-    user_id: user_id,
+    user_id,
+    username,
   };
   const options = {
-    expiresIn: "5m",
+    expiresIn: "30m",
   };
   return jwt.sign(payload, config.JWT_SECRET, options);
 }
 
-module.exports = createJWT;
+module.exports = createAccessToken;
