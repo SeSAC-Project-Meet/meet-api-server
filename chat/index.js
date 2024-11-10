@@ -97,6 +97,7 @@ function chatSocketRouter(io) {
     const rawToken = socket.request.headers.cookie;
     if (!rawToken) {
       logger.info(`[chatsocket] No cookie`);
+      socket.emit("unauthorized", "No Cookie Provided");
       socket.disconnect(`No Cookie Provided, Disconnecting`);
       return;
     }
@@ -105,6 +106,7 @@ function chatSocketRouter(io) {
 
     if (!token) {
       logger.info(`[chatsocket] No token`);
+      socket.emit("unauthorized", "No Token Provided");
       socket.disconnect(`No Token Provided, Disconnecting`);
       return;
     }
@@ -122,19 +124,7 @@ function chatSocketRouter(io) {
   });
 
   chatio.on("connection", async (socket) => {
-    // const recordSocketId = await insertSocketIdWithUserId(
-    //   socket.user,
-    //   socket.id
-    // );
-    // const senderSocketId = recordSocketId?.dataValues.socket_id;
-    // logger.info(
-    //   // TODO : ???
-    //   `User connected & socket id recorded: ${senderSocketId}`
-    // );
-
-    // socket.onAny((event, ...args) => {
-    //   logger.error(`[chatsocket] Event: ${event}, Args: ${args}`);
-    // });
+    logger.info(`/chat으로 socket.io 연결 수립됨: ${socket.id}`);
     socket.on("initialMessage", async (data) => {
       logger.info(`Initial Message: ${JSON.stringify(data, null, 2)}`);
       const { chatroom_id } = data;
@@ -169,34 +159,34 @@ function chatSocketRouter(io) {
         });
     });
 
-
     /* Video-calls */
     /**
      * Join Room
      */
-    socket.on('BE-join-room', ({meetroomId}) => {
+    socket.on("BE-join-room", ({ meetroomId }) => {
       // Socket Join RoomName
-      console.log('BE-join-room', meetroomId, socket.user);
+      console.log("BE-join-room", meetroomId, socket.user);
       socket.join(meetroomId);
       socketList[socket.id] = { user: socket.user, video: true, audio: true };
       // Set User List
-      io.sockets.in(meetroomId).allSockets().then(clients => {
-        try {
-          const users = [];
-          clients.forEach((client) => {
-            // Add User List
-            users.push({ userId: client, info: socketList[client] });
-            console.log("sdfdsfds");
-          });
-          socket.broadcast.to(meetroomId).emit('FE-user-join', users);
-          console.log(users);
-        } catch (e) {
-          console.log("error occur");
-        }
-      });
+      io.sockets
+        .in(meetroomId)
+        .allSockets()
+        .then((clients) => {
+          try {
+            const users = [];
+            clients.forEach((client) => {
+              // Add User List
+              users.push({ userId: client, info: socketList[client] });
+              console.log("sdfdsfds");
+            });
+            socket.broadcast.to(meetroomId).emit("FE-user-join", users);
+            console.log(users);
+          } catch (e) {
+            console.log("error occur");
+          }
+        });
     });
-
-
   });
 }
 
