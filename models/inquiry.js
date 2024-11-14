@@ -1,5 +1,5 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require("./connectToDB");
+const sequelize = require("./index");
 
 const Inquiry = sequelize.define(
   "Inquiry",

@@ -13,10 +13,10 @@ const cookieParser = require("cookie-parser");
 const { Server } = require("socket.io");
 const { PORT } = require("./config.json").development;
 
-const authRoutes = require("./auth/index.js");
-const inquiryRouter = require("./inquiry");
-const { chat, chatSocketRouter } = require("./chat/index.js");
-const verifyEmailRouter = require("./auth/verifyEmail");
+const authRoutes = require("./routes/authRouter.js");
+const inquiryRouter = require("./routes/inquiryRouter");
+const { chat, chatSocketRouter } = require("./routes/chatRouter.js");
+const verifyEmailRouter = require("./services/auth/verifyEmail");
 
 const app = express();
 
