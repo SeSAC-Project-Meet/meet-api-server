@@ -1,4 +1,4 @@
-const Message = require("../../models/message");
+const { Message } = require("../../models/index");
 
 const inputMessage = async (data) => {
   const { user_id, chatroom_id, type, content } = data;

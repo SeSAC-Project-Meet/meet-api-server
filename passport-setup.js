@@ -8,10 +8,9 @@ const axios = require("axios");
 const config = require("./config.json").development;
 const bcrypt = require("bcrypt");
 
-const User = require("./models/user"); // User 모델 경로
+const { User, UserRefreshToken } = require("./models/index");
 const getUserbyEmail = require("./repositories/user/getUserbyEmail");
 const logger = require("./logger");
-const User_refresh_token = require("./models/user_refresh_token");
 
 const optsCookie = {
   jwtFromRequest: ExtractJwt.fromExtractors([
@@ -44,15 +43,15 @@ passport.use(
   "jwtRefresh",
   new JWTStrategy(optsCookie, async (jwt_payload, done) => {
     logger.info(
-      `[passport-setup] RefreshToken 검증 시도 : ${JSON.stringify(jwt_payload, null, 2)}`,
+      `[passport-setup] RefreshToken 검증 시도 : ${JSON.stringify(jwt_payload, null, 2)}`
     );
     try {
       const user =
-        (await User_refresh_token.count({
+        (await UserRefreshToken.count({
           where: { user_id: jwt_payload.user_id, user_valid: true },
         })) > 0;
       logger.info(
-        `[passport-setup] RefreshToken 검증 결과 : ${JSON.stringify(user, null, 2)}`,
+        `[passport-setup] RefreshToken 검증 결과 : ${JSON.stringify(user, null, 2)}`
       );
       if (user) {
         return done(null, {
@@ -66,19 +65,19 @@ passport.use(
       logger.info(`[passport-setup] RefreshToken 검증 중 오류 발생 : ${error}`);
       return done(error, false);
     }
-  }),
+  })
 );
 
 passport.use(
   "jwt",
   new JWTStrategy(optsHeader, async (jwt_payload, done) => {
     logger.info(
-      `[passport-setup] jwt_payload : ${JSON.stringify(jwt_payload, null, 2)}`,
+      `[passport-setup] jwt_payload : ${JSON.stringify(jwt_payload, null, 2)}`
     );
     try {
       const user = await User.findByPk(jwt_payload.user_id); // payload에서 user_id로 사용자 찾기
       logger.info(
-        `[passport-setup] JWT에 따른 사용자 ID : ${user.dataValues.user_id}`,
+        `[passport-setup] JWT에 따른 사용자 ID : ${user.dataValues.user_id}`
       );
       if (user) {
         return done(null, user);
@@ -89,7 +88,7 @@ passport.use(
       logger.info(`[passport-setup] AccessToken Error : ${error}`);
       return done(error, false);
     }
-  }),
+  })
 );
 
 passport.use(
@@ -98,7 +97,7 @@ passport.use(
     { usernameField: "loginID", passwordField: "password" },
     async (loginID, password, done) => {
       logger.info(
-        `[passport-setup] 로그인 요청 id: ${loginID}, password: ${password}`,
+        `[passport-setup] 로그인 요청 id: ${loginID}, password: ${password}`
       );
       const user = await User.findOne({ where: { phone_number: loginID } });
       if (user && (await bcrypt.compare(password, user.password))) {
@@ -107,8 +106,8 @@ passport.use(
       }
       logger.info(`[passport-setup] 로그인 실패`);
       return done(null, false);
-    },
-  ),
+    }
+  )
 );
 
 passport.use(
@@ -124,7 +123,7 @@ passport.use(
     },
     async (accessToken, refreshToken, params, profile, done) => {
       logger.info(
-        `[passport-setup] 카카오 로그인 verify 함수:  ${JSON.stringify(params, null, 2)}`,
+        `[passport-setup] 카카오 로그인 verify 함수:  ${JSON.stringify(params, null, 2)}`
       );
       try {
         const kakaoProfileRes = await axios.get(
@@ -134,12 +133,12 @@ passport.use(
               Authorization: `Bearer ${accessToken}`,
               "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
             },
-          },
+          }
         );
 
         const kakaoUserProfile = kakaoProfileRes.data;
         logger.info(
-          `[passport-setup] 카카오 me로부터 가지고 온 정보 : ${JSON.stringify(kakaoUserProfile, null, 2)}`,
+          `[passport-setup] 카카오 me로부터 가지고 온 정보 : ${JSON.stringify(kakaoUserProfile, null, 2)}`
         );
 
         const kakaoUserProfileParsed = {
@@ -159,7 +158,7 @@ passport.use(
         } else {
           const userInfo = { ...kakaoUserProfileParsed, ...user };
           logger.info(
-            `[passport-setup] 카카오계정 이메일에 일치하는 사용자가 존재합니다, 다음 정보를 전달합니다 :\n${JSON.stringify(userInfo, null, 2)}`,
+            `[passport-setup] 카카오계정 이메일에 일치하는 사용자가 존재합니다, 다음 정보를 전달합니다 :\n${JSON.stringify(userInfo, null, 2)}`
           );
           return done(null, userInfo);
         }
@@ -167,8 +166,8 @@ passport.use(
         logger.info(`[passport-setup : kakao] Error : ${error}`);
         return done(error, null);
       }
-    },
-  ),
+    }
+  )
 );
 
 logger.info(`[INFO] passport-setup.js loaded`);

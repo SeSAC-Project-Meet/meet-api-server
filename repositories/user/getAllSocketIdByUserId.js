@@ -1,4 +1,4 @@
-const User_socket = require("../../models/user_socket");
+const { User_socket } = require("../../models/index");
 
 const getAllSocketIdByUserId = async (user_id) => {
   const result = await User_socket.findAll({

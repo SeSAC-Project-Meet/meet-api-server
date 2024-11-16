@@ -1,4 +1,4 @@
-const Term = require("../../models/term.js");
+const { Term } = require("../../models/index");
 
 const getTerms = async () => {
   const terms = await Term.findAll({

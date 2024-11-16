@@ -8,10 +8,10 @@ const chat = express.Router();
 const handleCreateChatroom = require("../controllers/interaction/chat/handleCreateChatroom");
 const handleGetChatroom = require("../controllers/interaction/chat/handleGetChatroom");
 const handleSocketMessage = require("../controllers/interaction/chat/handleSocketMessage");
-const User_socket = require("../models/user_socket");
 const handleGetChatsInChatroom = require("../controllers/interaction/chat/handleGetChatsInChatroom");
 
-const cookie = require("cookie");
+const { UserSocket } = require("../models/index");
+
 const logger = require("../logger");
 const getMessageByChatroomId = require("../repositories/message/getMessagesByChatroomId");
 const handleUserLeaveChatroom = require("../controllers/interaction/chat/handleUserLeaveChatroom");
@@ -52,44 +52,7 @@ chat.get(
 function chatSocketRouter(io) {
   logger.info(`./chat loaded`);
   const chatio = io.of("/chat");
-  const videocall = io.of("/videocall");
-  const groupcall = io.of("/groupcall");
   let socketList = {};
-
-  groupcall.on("connection", (socket) => {
-    socket.on("join-room", (roomId, userId) => {
-      socket.join(roomId);
-      socket.broadcast.to(roomId).emit("user-connected", userId);
-
-      socket.on("disconnect", () => {
-        socket.broadcast.to(roomId).emit("user-disconnected", userId);
-      });
-    });
-  });
-
-  videocall.on("connection", (socket) => {
-    logger.info(`User connected to /videocall namespace ${socket.id}`);
-
-    socket.on("offer", (data) => {
-      socket.broadcast.emit("offer", data);
-    });
-
-    socket.on("answer", (data) => {
-      socket.broadcast.emit("answer", data);
-    });
-
-    socket.on("candidate", (data) => {
-      socket.broadcast.emit("candidate", data);
-    });
-
-    socket.on("reconnect", () => {
-      logger.info(`User reconnected to /videocall namespace`);
-    });
-
-    socket.on("disconnect", (reason) => {
-      logger.info(`User disconnected: ${reason}`);
-    });
-  });
 
   chatio.use((socket, next) => {
     const authHeader = socket.request.headers.authorization;
@@ -148,7 +111,7 @@ function chatSocketRouter(io) {
     });
 
     socket.on("disconnect", (reason) => {
-      User_socket.destroy({ where: { socket_id: socket.id } })
+      UserSocket.destroy({ where: { socket_id: socket.id } })
         .then((result) => {
           logger.info(`User disconnected: ${reason}`);
           logger.info(`Deleted socket id record: ${result}`);

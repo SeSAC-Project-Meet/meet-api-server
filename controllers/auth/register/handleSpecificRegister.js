@@ -1,10 +1,9 @@
-const User_profile = require("../../../models/user_profile");
-const User_tag = require("../../../models/user_tag");
+const { UserProfile, UserTag } = require("../../../models");
 
 const handleSpecificRegister = async (req, res) => {
   const { nickname, mbti_id, hashtags, introduction, areas } = req.body;
   try {
-    const userProfileResult = await User_profile.create({
+    const userProfileResult = await UserProfile.create({
       user_id: req.user.user_id,
       nickname,
       introduction,
@@ -14,7 +13,7 @@ const handleSpecificRegister = async (req, res) => {
       user_id: req.user.user_id,
       tag_id,
     }));
-    const tagsResult = await User_tag.bulkCreate(bulkHashtags);
+    const tagsResult = await UserTag.bulkCreate(bulkHashtags);
 
     return res.status(201).json({
       message: "회원가입 완료",

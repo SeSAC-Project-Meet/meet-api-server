@@ -1,4 +1,4 @@
-const Term = require("../../models/term.js");
+const { Term } = require("../../models/index");
 
 const handleAddTerms = (req, res) => {
   const { title, content, is_required } = req.body;
