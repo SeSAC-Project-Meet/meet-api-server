@@ -1,5 +1,4 @@
-const Chatroom = require("../../../models/chatroom");
-const User_chatroom = require("../../../models/user_chatroom");
+const { Chatroom, User_chatroom: UserChatroom } = require("../../../models");
 const logger = require("../../../logger");
 
 const handleCreateChatroom = async (req, res) => {
@@ -11,7 +10,7 @@ const handleCreateChatroom = async (req, res) => {
   const chatroom = await Chatroom.create({ name, status: "active" });
   const chatroom_id = chatroom.dataValues.chatroom_id;
 
-  const registerUserToChatroom = await User_chatroom.create({
+  const registerUserToChatroom = await UserChatroom.create({
     chatroom_id,
     user_id: req.user.dataValues.user_id,
     user_status: "active",

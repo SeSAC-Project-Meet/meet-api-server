@@ -1,13 +1,9 @@
-require("../../../models/user_chatroom");
-require("../../../models/user_socket");
 const inputMessage = require("../../../repositories/message/inputMessage");
-require("../../../repositories/message/getMessagesByChatroomId");
 const logger = require("../../../logger");
-require("../../../repositories/user/getAllUserIdInChatroom");
 
 const handleSocketMessage = async (socket, data) => {
   logger.info(
-    `[handleSocketMessage] Data Recieved: ${JSON.stringify(data, null, 2)}`,
+    `[handleSocketMessage] Data Recieved: ${JSON.stringify(data, null, 2)}`
   );
   const user_id = socket.user;
   if (data.type === "image") {
@@ -24,14 +20,15 @@ const handleSocketMessage = async (socket, data) => {
   // 그 socket_id로 message를 보냄
   // 데이터 검증 형식 필요함
   logger.info(
-    `[handleSocketMessage] Data Renewed: ${JSON.stringify(data, null, 2)}`,
+    `[handleSocketMessage] Data Renewed: ${JSON.stringify(data, null, 2)}`
   );
 
   socket.broadcast.emit("message", data);
   socket.emit("message", data);
   socket.emit("error", Array.from(socket.rooms));
+
   logger.info(
-    `[handleSocketMessage] Message: ${JSON.stringify(data, null, 2)} \nto Chatroom ID: ${data.chatroom_id}`,
+    `[handleSocketMessage] Message: ${JSON.stringify(data, null, 2)} \nto Chatroom ID: ${data.chatroom_id}`
   );
 };
 

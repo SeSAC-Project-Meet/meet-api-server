@@ -1,4 +1,5 @@
-const User = require("../../models/user");
+const { User } = require("../../models/index");
+// TODO : 책임분리
 const logger = require("../../logger");
 
 const checkUniqueEmail = async (email) => {
@@ -11,7 +12,7 @@ const checkUniqueEmail = async (email) => {
     if (existingUser) {
       logger.info(
         "[checkUniqueEmail] User already exists with this Email:",
-        email,
+        email
       );
       return {
         status: 409,

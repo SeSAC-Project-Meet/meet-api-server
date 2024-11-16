@@ -1,5 +1,4 @@
-const Chatroom = require("../../../models/chatroom");
-const User_chatroom = require("../../../models/user_chatroom");
+const { UserChatroom, Chatroom } = require("../../../models/index");
 const logger = require("../../../logger");
 
 const handleGetChatroom = async (req, res) => {
@@ -7,7 +6,7 @@ const handleGetChatroom = async (req, res) => {
   logger.info(`[handleCreateChatroom] name: ${name}`);
   logger.info(`[handleCreateChatroom] user: ${req.user.dataValues.user_id}`);
 
-  const getUserChatroom = await User_chatroom.findAll({
+  const getUserChatroom = await UserChatroom.findAll({
     attributes: ["chatroom_id"],
     where: {
       user_id: req.user.dataValues.user_id,
@@ -15,7 +14,7 @@ const handleGetChatroom = async (req, res) => {
     },
   });
   logger.info(
-    `[handleGetChatroom] getUserChatroom: ${JSON.stringify(getUserChatroom)}`,
+    `[handleGetChatroom] getUserChatroom: ${JSON.stringify(getUserChatroom)}`
   );
 
   const chatrooms = await Promise.all(
@@ -31,7 +30,7 @@ const handleGetChatroom = async (req, res) => {
         id: userChatroom.dataValues.chatroom_id,
         name: chatroom.dataValues.name,
       };
-    }),
+    })
   );
 
   logger.info(`[handleGetChatroom] chatrooms: ${JSON.stringify(chatrooms)}`);

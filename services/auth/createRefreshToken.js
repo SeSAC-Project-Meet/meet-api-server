@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
-const User_refresh_token = require("../../models/user_refresh_token");
+const { UserRefreshToken } = require("../../models/index");
+// TODO : repository로 책임분리 필요
 const config = require("../../config.json").development;
 
 async function createRefreshToken(user_id, username) {
@@ -12,7 +13,7 @@ async function createRefreshToken(user_id, username) {
   };
   const result = jwt.sign(payload, config.JWT_SECRET, options);
 
-  await User_refresh_token.create({
+  await UserRefreshToken.create({
     user_id,
     token: result,
   });
