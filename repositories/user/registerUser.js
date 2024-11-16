@@ -1,4 +1,4 @@
-const User = require("../../models/user");
+const { User } = require("../../models/index");
 const logger = require("../../logger");
 
 /**
@@ -23,7 +23,7 @@ async function registerUser(userData) {
     if (existingUser) {
       logger.info(
         "User already exists with this phone_number:",
-        userData.phone_number,
+        userData.phone_number
       );
       return {
         status: 409,

@@ -4,7 +4,7 @@ const router = express.Router();
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
-const Inquiry = require("../models/inquiry");
+const { Inquiry } = require("../models/index");
 const logger = require("../logger");
 
 try {

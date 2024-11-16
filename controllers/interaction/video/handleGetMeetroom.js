@@ -1,18 +1,17 @@
-const Meetroom = require("../../../models/meetroom");
-const User_meetroom = require("../../../models/user_meetroom");
+const { UserMeetroom } = require("../../../models/index");
 const logger = require("../../../logger");
 
 const handleGetMeetroom = async (req, res) => {
   logger.info(`[handleCreateMeetroom] user: ${req.user.dataValues.user_id}`);
 
-  const getUserMeetroom = await User_meetroom.findAll({
+  const getUserMeetroom = await UserMeetroom.findAll({
     attributes: ["meetroom_id"],
     where: {
       user_id: req.user.dataValues.user_id,
     },
   });
   logger.info(
-    `[handleGetMeetroom] getUserMeetroom: ${JSON.stringify(getUserMeetroom)}`,
+    `[handleGetMeetroom] getUserMeetroom: ${JSON.stringify(getUserMeetroom)}`
   );
 
   const meetrooms = await Promise.all(
@@ -20,7 +19,7 @@ const handleGetMeetroom = async (req, res) => {
       return {
         id: userMeetroom.dataValues.meetroom_id,
       };
-    }),
+    })
   );
 
   logger.info(`[handleGetMeetroom] meetrooms: ${JSON.stringify(meetrooms)}`);

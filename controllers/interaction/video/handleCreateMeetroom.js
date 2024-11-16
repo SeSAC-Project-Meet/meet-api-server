@@ -1,5 +1,4 @@
-const Meetroom = require("../../../models/meetroom");
-const User_meetroom = require("../../../models/user_meetroom");
+const { Meetroom, UserMeetroom } = require("../../../models/index");
 const logger = require("../../../logger");
 
 const handleCreateMeetroom = async (req, res) => {
@@ -8,7 +7,7 @@ const handleCreateMeetroom = async (req, res) => {
   const meetroom = await Meetroom.create({});
   const meetroom_id = meetroom.dataValues.meetroom_id;
 
-  const registerUserToMeetroom = await User_meetroom.create({
+  const registerUserToMeetroom = await UserMeetroom.create({
     meetroom_id,
     user_id: req.user.dataValues.user_id,
   });

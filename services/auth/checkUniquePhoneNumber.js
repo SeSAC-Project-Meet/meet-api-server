@@ -1,4 +1,4 @@
-const User = require("../../models/user");
+const { User } = require("../../models/index");
 const logger = require("../../logger");
 
 const checkUniquePhoneNumber = async (phone_number) => {
@@ -11,7 +11,7 @@ const checkUniquePhoneNumber = async (phone_number) => {
     if (existingUser) {
       logger.info(
         "[checkUniquephone_number] User already exists with this Phone Number:",
-        phone_number,
+        phone_number
       );
       return {
         status: 409,
@@ -20,18 +20,18 @@ const checkUniquePhoneNumber = async (phone_number) => {
     } else {
       logger.info(
         "[checkUniquePhoneNumber] Unique Phone Number, good to go : ",
-        phone_number,
+        phone_number
       );
       return { status: 200, message: "Unique Phone Number, good to go" };
     }
   } catch (error) {
     console.error(
       "[checkUniquePhoneNumber] Error checking Phone Number",
-      error,
+      error
     );
     throw new Error(
       "[checkUniquePhoneNumber] Error checking Phone Number",
-      error,
+      error
     );
   }
 };

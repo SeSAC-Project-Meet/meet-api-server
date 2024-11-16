@@ -1,4 +1,4 @@
-const User_socket = require("../../models/user_socket");
+const { User_socket } = require("../../models/index");
 
 const insertSocketIdWithUserId = async (user_id, socket_id) => {
   try {

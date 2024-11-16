@@ -1,5 +1,5 @@
 const logger = require("../../logger");
-const User_chatroom = require("../../models/user_chatroom");
+const { User_chatroom } = require("../../models/index");
 
 const getAllUserIdInChatroom = async (chatroom_id) => {
   const result = await User_chatroom.findAll({

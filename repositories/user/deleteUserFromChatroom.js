@@ -1,5 +1,5 @@
 const logger = require("../../logger");
-const User_chatroom = require("../../models/user_chatroom");
+const { User_chatroom } = require("../../models/index");
 
 const deleteUserFromChatroom = async (chatroomId, userId) => {
   try {
@@ -10,16 +10,16 @@ const deleteUserFromChatroom = async (chatroomId, userId) => {
           user_id: userId,
           chatroom_id: chatroomId,
         },
-      },
+      }
     );
     if (!userChatroom) {
       logger.info(
-        `[deleteUserFromChatroom] User ${userId} is not in chatroom ${chatroomId}`,
+        `[deleteUserFromChatroom] User ${userId} is not in chatroom ${chatroomId}`
       );
       return false;
     } else {
       logger.info(
-        `[deleteUserFromChatroom] User ${userId} left chatroom ${chatroomId}`,
+        `[deleteUserFromChatroom] User ${userId} left chatroom ${chatroomId}`
       );
       return true;
     }
