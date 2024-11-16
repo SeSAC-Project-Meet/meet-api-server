@@ -5,6 +5,8 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const Inquiry = require("../models/inquiry");
+// TODO : 모델 객체를 db 객체에 연결한 다음에는 db 객체에서 가져오기
+// const { Inquiry } = require("../models/index.js");
 const logger = require("../logger");
 
 try {
@@ -39,6 +41,8 @@ router.post("/image", upload.single("image1"), (req, res, next) => {
 });
 
 const upload2 = multer();
+
+router.get("/");
 
 router
   .route("/")

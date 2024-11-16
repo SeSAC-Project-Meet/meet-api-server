@@ -1,19 +1,16 @@
 const express = require("express");
 const https = require("https");
 const fs = require("fs");
-
 const cors = require("cors");
 const logger = require("./logger");
-
 const morgan = require("morgan");
-
 const passport = require("passport");
 const cookieParser = require("cookie-parser");
-
 const { Server } = require("socket.io");
+
 const { PORT } = require("./config.json").development;
 
-const authRoutes = require("./routes/authRouter.js");
+const authRouter = require("./routes/authRouter.js");
 const inquiryRouter = require("./routes/inquiryRouter");
 const { chat, chatSocketRouter } = require("./routes/chatRouter.js");
 const verifyEmailRouter = require("./services/auth/verifyEmail");
@@ -26,13 +23,6 @@ const corsOptions = {
   origin: ["http://localhost:5173", "http://192.168.0.24:5173"],
   credentials: true,
 };
-
-// SSL 인증서 로드
-const sslOptions = {
-  key: fs.readFileSync("localhost-key.pem"), // 개인 키 파일
-  cert: fs.readFileSync("localhost-cert.pem"), // 인증서 파일
-};
-
 app.use(cors(corsOptions));
 
 const customlogger = (req, res, next) => {
@@ -47,9 +37,6 @@ const customlogger = (req, res, next) => {
   };
 
   logger.info(logText);
-
-  // res.send(logText); // 주석처리 해제 안하면 crash .. 확인용 코드라 그럼
-  // logger.info(logText);
   next();
 };
 
@@ -63,13 +50,16 @@ app.use(express.urlencoded({ extended: false }));
 app.use(passport.initialize());
 require("./passport-setup");
 
-app.use("/auth", authRoutes);
-
+app.use("/auth", authRouter);
 app.use("/inquiry", inquiryRouter);
-
 app.use("/api-test", verifyEmailRouter);
-
 app.use("/chat", chat);
+
+// SSL 인증서 로드
+const sslOptions = {
+  key: fs.readFileSync("localhost-key.pem"), // 개인 키 파일
+  cert: fs.readFileSync("localhost-cert.pem"), // 인증서 파일
+};
 
 const server = https.createServer(sslOptions, app);
 server.listen(PORT, "0.0.0.0", () => {
