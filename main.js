@@ -3,7 +3,7 @@ const https = require("https");
 const fs = require("fs");
 
 const cors = require("cors");
-const logger = require("./logger");
+const logger = require("./logger.js");
 
 const morgan = require("morgan");
 
@@ -14,9 +14,9 @@ const { Server } = require("socket.io");
 const { PORT } = require("./config.json").development;
 
 const authRoutes = require("./routes/authRouter.js");
-const inquiryRouter = require("./routes/inquiryRouter");
+const inquiryRouter = require("./routes/inquiryRouter.js");
 const { chat, chatSocketRouter } = require("./routes/chatRouter.js");
-const verifyEmailRouter = require("./services/auth/verifyEmail");
+const verifyEmailRouter = require("./services/auth/verifyEmail.js");
 
 const app = express();
 
@@ -61,7 +61,7 @@ app.use(express.urlencoded({ extended: false }));
 
 // Passport 초기화
 app.use(passport.initialize());
-require("./passport-setup");
+require("./passport-setup.js");
 
 app.use("/auth", authRoutes);
 
