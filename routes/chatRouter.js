@@ -162,29 +162,44 @@ function chatSocketRouter(io) {
     /**
      * Join Room
      */
-    socket.on("BE-join-room", ({ meetroomId }) => {
-      // Socket Join RoomName
-      console.log("BE-join-room", meetroomId, socket.user);
-      socket.join(meetroomId);
-      socketList[socket.id] = { user: socket.user, video: true, audio: true };
-      // Set User List
-      io.sockets
-        .in(meetroomId)
-        .allSockets()
-        .then((clients) => {
-          try {
-            const users = [];
-            clients.forEach((client) => {
-              // Add User List
-              users.push({ userId: client, info: socketList[client] });
-              console.log("sdfdsfds");
-            });
-            socket.broadcast.to(meetroomId).emit("FE-user-join", users);
-            console.log(users);
-          } catch (e) {
-            console.log("error occur");
+    socket.on("BE-join-room", async ({ meetroomId }) => {
+      // 해당 방이 이미 존재하는지 체크(소켓을 이용해서)
+      if (socket.rooms.has(meetroomId)) {
+        console.log(`Room ${meetroomId} already exists.`);
+      } else {
+        console.log(`Room ${meetroomId} does not exist, creating...`);
+      }
+    
+      try {
+        // 비동기적으로 join 처리
+        await socket.join(meetroomId); // join이 성공적으로 끝날 때까지 기다림
+        console.log(`Socket ${socket.id} joined room ${meetroomId}`);
+        
+        const room = socket.adapter.rooms.get(meetroomId);
+        if (!room) {
+          console.log(`Room ${meetroomId} does not exist after join.`);
+          return;
+        }
+
+        const clients = room;
+  
+        // socketList에 사용자 정보 저장
+        socketList[socket.id] = { userId: socket.user, video: true, audio: true };
+  
+        // Set User List
+        const users = [];
+        Array.from(clients).forEach((clientId) => {
+          if (socketList[clientId]) {
+            users.push({ userSocketId: clientId, info: socketList[clientId] });
           }
         });
+  
+        // 방에 참가한 사용자에게 `FE-user-join` 이벤트를 전달
+        socket.broadcast.to(meetroomId).emit("FE-user-join", users);
+        console.log("Users in room:", users);
+      } catch (err) {
+        console.error("오류: Error joining room:", err);
+      }
     });
   });
 }
