@@ -1,4 +1,4 @@
-const Message = require("../../models/message");
+const { Message } = require("../../models/index");
 const logger = require("../../logger");
 
 const getMessageByChatroomId = async (chatroomId) => {

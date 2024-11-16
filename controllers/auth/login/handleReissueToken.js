@@ -1,4 +1,4 @@
-const User = require("../../../models/user");
+const { User } = require("../../../models/index");
 const createAccessToken = require("../../../services/auth/createAccessToken");
 
 const handleReissueToken = async (req, res) => {
@@ -9,7 +9,7 @@ const handleReissueToken = async (req, res) => {
   console.error("aejfasdfjkasd USERNAME", username);
   const createdAccessToken = createAccessToken(
     user.user_id,
-    username.dataValues.username,
+    username.dataValues.username
   );
   return res.status(201).json({
     token: createdAccessToken,

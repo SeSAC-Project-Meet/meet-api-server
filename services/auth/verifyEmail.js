@@ -1,5 +1,5 @@
 const nodemailer = require("nodemailer");
-const config = require("../../config.json")["development"];
+const config = require("../../config.json").development;
 
 // 이메일 전송 함수
 async function sendVerificationEmail(email, token) {
@@ -23,7 +23,7 @@ async function sendVerificationEmail(email, token) {
 }
 
 const express = require("express");
-const User = require("../../models/user");
+const { User } = require("../../models/index");
 const router = express.Router();
 
 // exports.checkEmail = async (req, res, next) => {
@@ -56,7 +56,7 @@ const checkEmail = async (req, res, next) => {
 
 // exports.sendEmailWithToken = async(req, res, next) => {}
 const crypto = require("crypto");
-const UserToken = require("../../models/user_token");
+const { UserToken } = require("../../models/index");
 const { Op } = require("sequelize");
 
 const sendEmailWithToken = async (req, res) => {
