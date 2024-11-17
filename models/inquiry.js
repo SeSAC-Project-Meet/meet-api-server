@@ -1,37 +1,42 @@
-const Sequelize = require("sequelize");
+const { Model, DataTypes } = require("sequelize");
 
-class Inquiry extends Sequelize.Model {
-  static initiate(sequelize) {
-    Inquiry.init(
+class Inquiry extends Model {
+  static init(sequelize) {
+    super.init(
+      // Inquiry.init() = super.init() 과 같은 역할
       {
         inquiry_id: {
-          type: Sequelize.INTEGER,
+          type: DataTypes.INTEGER, // Sequelize.INTEGER 로 대체 가능
           autoIncrement: true,
           primaryKey: true,
         },
+        user_id: {
+          type: DataTypes.INTEGER,
+          allowNull: true,
+        },
         title: {
-          type: Sequelize.STRING(100), // 4 bytes * 100
+          type: DataTypes.STRING(100), // 4 bytes * 100
           allowNull: false,
         },
         content: {
-          type: Sequelize.STRING(4096), // 4 bytes * 4096
+          type: DataTypes.STRING(4096), // 4 bytes * 4096
           allowNull: false,
         },
         photo_url_1: {
-          type: Sequelize.STRING(1024), // 4 bytes * 1024
+          type: DataTypes.STRING(1024), // 4 bytes * 1024
           allowNull: true,
         },
         created_at: {
-          type: Sequelize.DATE(6),
+          type: DataTypes.DATE(6),
+          defaultValue: DataTypes.NOW,
+          // defaultValue: Sequelize.literal("CURRENT_TIMESTAMP(6)"),
           allowNull: false,
-          defaultValue: Sequelize.literal("CURRENT_TIMESTAMP(6)"),
-          // type: Sequelize.DATE,
-          // defaultValue: Sequelize.NOW,
         },
         updated_at: {
-          type: Sequelize.DATE(6),
+          type: DataTypes.DATE(6),
+          defaultValue: DataTypes.NOW,
+          // defaultValue: Sequelize.literal("CURRENT_TIMESTAMP(6)")
           allowNull: false,
-          defaultValue: Sequelize.literal("CURRENT_TIMESTAMP(6)"),
         }, // TODO : 필요 없는 컬럼?
         // read_at: {
         //   type: Sequelize.DATE(6),
@@ -49,21 +54,18 @@ class Inquiry extends Sequelize.Model {
       },
       {
         sequelize,
-        timestamps: false,
-        modelName: "Inquiry",
         tableName: "inquiry",
-        paranoid: false,
-        charset: "utf8mb4",
-        collate: "utf8mb4_general_ci", // utf8mb4_0900_ai_ci ?
-      }
+        timestamps: false,
+        // modelName: "Inquiry",
+        // paranoid: false,
+        // charset: "utf8mb4",
+        // collate: "utf8mb4_general_ci", // utf8mb4_0900_ai_ci ?
+      },
     );
   }
 
-  static associate(db) {
-    db.User.belongsTo(db.User, {
-      // foreignKey: "",
-      targetKey: "user_id",
-    });
+  static associate(models) {
+    models.Inquiry.belongsTo(models.User, { foreignKey: "user_id" });
   }
 }
 
